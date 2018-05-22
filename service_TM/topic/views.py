@@ -74,7 +74,7 @@ class KeywordViewSet(viewsets.ViewSet):
         return Response(data={":)"})
 
 
-keyword_list = TopicViewSet.as_view({
+keyword_list = KeywordViewSet.as_view({
     'get': 'list',
     'post': 'create',
     'put': 'update',
@@ -122,8 +122,7 @@ class TopicUserViewSet(viewsets.ViewSet):
 
 
 topicUser_list = TopicUserViewSet.as_view({
-    'post': 'create',
+    'post': 'list',
     'put': 'update',
     'patch': 'partial_update',
-    'view': 'list',
 })
