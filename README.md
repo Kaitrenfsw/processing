@@ -2,6 +2,8 @@
 
 ## How to Run?
 
+Database: Postgres  9.5.12>=
+
 ### Linux/MacOS
 
 Install a virtualenv with python3 more info [here](https://rukbottoland.com/blog/tutorial-de-python-virtualenv/)
@@ -12,16 +14,23 @@ Run the virtualenv:
 ``` $ source venv/bin/activate```
 
 Install requirements.txt:
+
 ``` $ pip install -r requirements.txt ```
+
+Run Migrations from service_TM folder:
+
+``` python manage.py makemigrations ```
+
+``` pýthon manage.py migrate ```
 
 Run Django API from service_TM folder:
 
 ``` $ python manage.py runserver ```
 
 
-API Endpoints:
+#API Endpoints:
 
-Topic: [http://127.0.0.1:8000/topic/](http://127.0.0.1:8000/topic/)
+#####Topic: [http://127.0.0.1:8000/topic/](http://127.0.0.1:8000/topic/)
 
 - methods allowed: GET
 - Request: empty
@@ -64,7 +73,7 @@ Topic: [http://127.0.0.1:8000/topic/](http://127.0.0.1:8000/topic/)
 ]
 ``` 
 
-Keyword: [http://127.0.0.1:8000/keyword/](http://127.0.0.1:8000/keyword/)
+#####Keyword: [http://127.0.0.1:8000/keyword/](http://127.0.0.1:8000/keyword/)
 
 - methods allowed: GET
 - Request: empty
@@ -86,7 +95,7 @@ Keyword: [http://127.0.0.1:8000/keyword/](http://127.0.0.1:8000/keyword/)
     ...
 ]
 ```
-TopicUser: [http://127.0.0.1:8000/topicUser/](http://127.0.0.1:8000/topicUser/)
+#####TopicUser: [http://127.0.0.1:8000/topicUser/](http://127.0.0.1:8000/topicUser/)
 
 - methods allowed: POST
 - Request: 
