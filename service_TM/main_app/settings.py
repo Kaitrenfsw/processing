@@ -82,10 +82,10 @@ WSGI_APPLICATION = 'main_app.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'kompaz',
+        'NAME': 'postgres',
         'USER': 'postgres',
-        'PASSWORD': 'root',
-        'HOST': 'localhost',
+        'PASSWORD': 'postgres',
+        'HOST': 'db',
         'PORT': 5432,
     }
 }
