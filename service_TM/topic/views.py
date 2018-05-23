@@ -20,7 +20,12 @@ class TopicViewSet(viewsets.ViewSet):
 
     @staticmethod
     def create(request):
-        return Response(data={":)"})
+        new_topic_data = request.data
+        new_topic = Topic(topic_number=new_topic_data['topic_number'],
+                          corpus_number=new_topic_data['corpus_number'],
+                          name=new_topic_data['topic_name'])
+        new_topic.save()
+        return Response(data={"New Topic added successfully"}, status=status.HTTP_200_OK)
 
     @staticmethod
     def retrieve(request, pk=None):
@@ -130,7 +135,7 @@ class TopicUserViewSet(viewsets.ViewSet):
             print(":()")
         else:
             print("chan!")
-        return Response(data={":)456"})
+        return Response(data={":)"})
 
     @staticmethod
     def destroy(request, pk=None):
