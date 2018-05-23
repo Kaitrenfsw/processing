@@ -106,7 +106,23 @@ class TopicUserViewSet(viewsets.ViewSet):
 
     @staticmethod
     def update(request, pk=None):
-        return Response(data={":123)"})
+        data = request.data
+        older_topics = TopicUser.objects.filter(user_id=1).values_list('topic_id', flat=True)
+        updated_topics = data["user_topics_id"]
+
+        # adding new topics that didn't exist
+        for new_topic_id in updated_topics:
+            if new_topic_id not in older_topics:
+                topic_instance = Topic.objects.get(id=new_topic_id)
+                topic = TopicUser(user_id=data['user_id'], topic_id=topic_instance)
+                topic.save()
+        # deleting topics
+        for old_topic_id in older_topics:
+            if old_topic_id not in updated_topics:
+                topicuser_instance = TopicUser.objects.get(id=old_topic_id)
+                topicuser_instance.delete()
+
+        return Response(data={}, status=status.HTTP_200_OK)
 
     @staticmethod
     def partial_update(request, pk=None):
