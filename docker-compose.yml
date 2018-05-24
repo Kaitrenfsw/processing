@@ -3,8 +3,7 @@ version: '3'
 services:
   db:
     image: postgres
-    volumes:
-      - "./data/preprocesamiento:/var/lib/postgresql/data/pgdata"
+
   web:
     build: .
     command: python3 service_TM/manage.py makemigrations
