@@ -1,5 +1,5 @@
 from topic.models import Topic, Keyword, TopicUser
-from topic.serializers import TopicSerializer, KeywordSerializer, TopicUserSerializer, TopicKeywordSerializer
+from topic.serializers import KeywordSerializer, TopicKeywordSerializer
 from rest_framework import viewsets, status
 from rest_framework.response import Response
 
@@ -9,21 +9,38 @@ class TopicViewSet(viewsets.ViewSet):
     @staticmethod
     def list(request):
         topics = Topic.objects.all()
-        response_array = []
-        for topic in topics:
-            serialized = TopicKeywordSerializer(topic).data
-            response_array.append(serialized)
+        response_json = []
+        response_status = ""
+        try:
+            for topic in topics:
+                serialized_topic = TopicKeywordSerializer(topic).data
+                response_json.append(serialized_topic)
+                response_status = status.HTTP_200_OK
+        except Exception as e:
+            response_json = {"Exception raised": e}
+            response_status = status.HTTP_404_NOT_FOUND
 
-        return Response(data=response_array, status=status.HTTP_200_OK)
+        return Response(data=response_json, status=response_status)
 
     @staticmethod
     def create(request):
-        new_topic_data = request.data
-        new_topic = Topic(topic_number=new_topic_data['topic_number'],
-                          corpus_number=new_topic_data['corpus_number'],
-                          name=new_topic_data['topic_name'])
-        new_topic.save()
-        return Response(data={"New Topic added successfully"}, status=status.HTTP_200_OK)
+        if ('topic_number' and 'corpus_number' and 'topic_name') in request.data:
+            try:
+                new_topic_data = request.data
+                new_topic = Topic(topic_number=new_topic_data['topic_number'],
+                                  corpus_number=new_topic_data['corpus_number'],
+                                  name=new_topic_data['topic_name'])
+                new_topic.save()
+                response_message = {"New Topic added successfully"}
+                response_status = status.HTTP_200_OK
+            except Exception as e:
+                response_message = {"Exception raised": e}
+                response_status = status.HTTP_500_INTERNAL_SERVER_ERROR
+        else:
+            response_message = {"Bad Request, check sent parameters"}
+            response_status = status.HTTP_400_BAD_REQUEST
+
+        return Response(data=response_message, status=response_status)
 
     @staticmethod
     def retrieve(request, pk=None):
@@ -45,7 +62,6 @@ class TopicViewSet(viewsets.ViewSet):
 topic_list = TopicViewSet.as_view({
     'get': 'list',
     'post': 'create',
-    'put': 'update',
 })
 
 
@@ -53,8 +69,14 @@ class KeywordViewSet(viewsets.ViewSet):
 
     @staticmethod
     def list(request):
-        queryset = KeywordSerializer(Keyword.objects.all(), many=True).data
-        return Response(data=queryset, status=status.HTTP_200_OK)
+        try:
+            response_json = KeywordSerializer(Keyword.objects.all(), many=True).data
+            response_status = status.HTTP_200_OK
+        except Exception as e:
+            response_json = {"Exception raised": e}
+            response_status = status.HTTP_500_INTERNAL_SERVER_ERROR
+
+        return Response(data=response_json, status=response_status)
 
     @staticmethod
     def create(request):
@@ -79,8 +101,6 @@ class KeywordViewSet(viewsets.ViewSet):
 
 keyword_list = KeywordViewSet.as_view({
     'get': 'list',
-    'post': 'create',
-    'put': 'update',
 })
 
 
@@ -88,16 +108,24 @@ class TopicUserViewSet(viewsets.ViewSet):
 
     @staticmethod
     def list(request):
-        usertopics = TopicUser.objects.filter(user_id=1)
-        response_array = []
-        for topic in usertopics:
-            dic_of_topics = {}
-            keywords = Keyword.objects.filter(topic_id=topic.pk)
-            dic_of_topics['topic'] = TopicUserSerializer(topic).data
-            dic_of_topics['topic']['keywords'] = KeywordSerializer(keywords, many=True).data
-            response_array.append(dic_of_topics)
+        if 'user_id' in request.data:
+            try:
+                user_info = request.data
+                user_topics = TopicUser.objects.filter(user_id=user_info["user_id"]).values_list('id')
+                topics = Topic.objects.filter(id__in=user_topics)
+                response_message = []
+                for topic in topics:
+                    serialized_topic = TopicKeywordSerializer(topic).data
+                    response_message.append(serialized_topic)
+                response_status = status.HTTP_200_OK
+            except Exception as e:
+                response_message = {"Exception raised" : e}
+                response_status = status.HTTP_500_INTERNAL_SERVER_ERROR
+        else:
+            response_message = {"Bad Request, check sent parameters"}
+            response_status = status.HTTP_400_BAD_REQUEST
 
-        return Response(data=response_array, status=status.HTTP_200_OK)
+        return Response(data=response_message, status=response_status)
 
     @staticmethod
     def create(request):
@@ -109,30 +137,36 @@ class TopicUserViewSet(viewsets.ViewSet):
 
     @staticmethod
     def update(request, pk=None):
-        data = request.data
-        older_topics = TopicUser.objects.filter(user_id=1).values_list('topic_id', flat=True)
-        updated_topics = data["user_topics_id"]
+        if ('topic_id' and 'user_topics_id') in request.data:
+            try:
+                data = request.data
+                older_topics = TopicUser.objects.filter(user_id=1).values_list('topic_id', flat=True)
+                updated_topics = data["user_topics_id"]
 
-        # adding new topics that didn't exist
-        for new_topic_id in updated_topics:
-            if new_topic_id not in older_topics:
-                topic_instance = Topic.objects.get(id=new_topic_id)
-                topic = TopicUser(user_id=data['user_id'], topic_id=topic_instance)
-                topic.save()
-        # deleting topics
-        for old_topic_id in older_topics:
-            if old_topic_id not in updated_topics:
-                topicuser_instance = TopicUser.objects.get(id=old_topic_id)
-                topicuser_instance.delete()
+                # adding new topics that didn't exist
+                for new_topic_id in updated_topics:
+                    if new_topic_id not in older_topics:
+                        topic_instance = Topic.objects.get(id=new_topic_id)
+                        topic = TopicUser(user_id=data['user_id'], topic_id=topic_instance)
+                        topic.save()
+                # deleting topics
+                for old_topic_id in older_topics:
+                    if old_topic_id not in updated_topics:
+                        topic_user_instance = TopicUser.objects.get(id=old_topic_id)
+                        topic_user_instance.delete()
+                response_message = {"Topics updated successfully!"}
+                response_status = status.HTTP_200_OK
+            except Exception as e:
+                response_message = {"Exception raised": e}
+                response_status = status.HTTP_500_INTERNAL_SERVER_ERROR
+        else:
+            response_message = {"Bad Request, check sent parameters"}
+            response_status = status.HTTP_400_BAD_REQUEST
 
-        return Response(data={}, status=status.HTTP_200_OK)
+        return Response(data=response_message, status=response_status)
 
     @staticmethod
     def partial_update(request, pk=None):
-        if 'id' in request.data:
-            print(":()")
-        else:
-            print("chan!")
         return Response(data={":)"})
 
     @staticmethod
@@ -143,5 +177,4 @@ class TopicUserViewSet(viewsets.ViewSet):
 topicUser_list = TopicUserViewSet.as_view({
     'post': 'list',
     'put': 'update',
-    'patch': 'partial_update',
 })
