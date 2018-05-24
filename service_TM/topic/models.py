@@ -1,9 +1,10 @@
 from django.db import models
+from TMengine.models import LdaModel
 
 
 class Topic(models.Model):
     topic_number = models.IntegerField(null=False)
-    corpus_number = models.IntegerField(null=False)
+    lda_model = models.ForeignKey(LdaModel, on_delete=models.CASCADE, related_name='topic_ldamodel')
     name = models.CharField(null=True, blank=True, max_length=100)
 
 

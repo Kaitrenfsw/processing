@@ -25,7 +25,7 @@ class TopicUserSerializer(serializers.ModelSerializer):
 
 
 class TopicKeywordSerializer(serializers.ModelSerializer):
-    keyword_topic = KeywordSerializer(many=True, read_only=True)
+    keyword_topic = KeywordSerializer(many=True)
 
     class Meta:
         model = Topic

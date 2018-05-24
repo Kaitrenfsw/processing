@@ -1,5 +1,6 @@
-from topic.models import Topic, Keyword, TopicUser
-from topic.serializers import KeywordSerializer, TopicKeywordSerializer
+from .models import Topic, Keyword, TopicUser, LdaModel
+from .serializers import KeywordSerializer, TopicKeywordSerializer
+from TMengine.engine_trainer import get_topics
 from rest_framework import viewsets, status
 from rest_framework.response import Response
 
@@ -48,7 +49,18 @@ class TopicViewSet(viewsets.ViewSet):
 
     @staticmethod
     def update(request, pk=None):
-        return Response(data={":)"})
+        new_topics = get_topics()
+        for topic in new_topics:
+            ldamodel_instance = LdaModel.objects.get(filename=topic['lda_model'])
+            topic_instance = Topic(topic_number=topic['topic_number'],
+                                   lda_model=ldamodel_instance)
+            topic_instance.save()
+            for keyword in topic["keywords"]:
+                keyword_instance = Keyword(name=keyword['name'],
+                                           weight=round(keyword['weight'], 2),
+                                           topic_id=topic_instance)
+                keyword_instance.save()
+        return Response(data=new_topics)
 
     @staticmethod
     def partial_update(request, pk=None):
@@ -62,6 +74,7 @@ class TopicViewSet(viewsets.ViewSet):
 topic_list = TopicViewSet.as_view({
     'get': 'list',
     'post': 'create',
+    'put': 'update',
 })
 
 
