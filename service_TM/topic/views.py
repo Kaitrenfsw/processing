@@ -1,5 +1,5 @@
 from topic.models import Topic, Keyword, TopicUser
-from topic.serializers import TopicSerializer, KeywordSerializer, TopicUserSerializer
+from topic.serializers import TopicSerializer, KeywordSerializer, TopicUserSerializer, TopicKeywordSerializer
 from rest_framework import viewsets, status
 from rest_framework.response import Response
 
@@ -11,11 +11,9 @@ class TopicViewSet(viewsets.ViewSet):
         topics = Topic.objects.all()
         response_array = []
         for topic in topics:
-            dic_of_topics = {}
-            keywords = Keyword.objects.filter(topic_id=topic.pk)
-            dic_of_topics['topic'] = TopicSerializer(topic).data
-            dic_of_topics['topic']['keywords'] = KeywordSerializer(keywords, many=True).data
-            response_array.append(dic_of_topics)
+            serialized = TopicKeywordSerializer(topic).data
+            response_array.append(serialized)
+
         return Response(data=response_array, status=status.HTTP_200_OK)
 
     @staticmethod
