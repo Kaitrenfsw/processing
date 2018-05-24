@@ -15,14 +15,15 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.conf.urls import url, include
-from topic import views
-
+from topic import views as topic_views
+from TMengine import views as lda_views
 
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
-    url(r'^topic/$', views.topic_list, name='topic-API'),
-    url(r'^topicUser/$', views.topicUser_list, name='topicUser-API'),
-    url(r'^keyword/$', views.keyword_list, name='keyword-API'),
+    url(r'^topic/$', topic_views.topic_list, name='topic-API'),
+    url(r'^topicUser/$', topic_views.topicUser_list, name='topicUser-API'),
+    url(r'^keyword/$', topic_views.keyword_list, name='keyword-API'),
+    url(r'^ldamodel/$', lda_views.lda_model_list, name='lda-model-API'),
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
 ]

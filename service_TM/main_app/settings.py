@@ -44,6 +44,7 @@ INSTALLED_APPS = [
 
     # internal_apps
     'topic',
+    'TMengine',
 ]
 
 MIDDLEWARE = [
@@ -92,10 +93,10 @@ WSGI_APPLICATION = 'main_app.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'postgres',
+        'NAME': 'kompaz',
         'USER': 'postgres',
-        'PASSWORD': 'postgres',
-        'HOST': 'db',
+        'PASSWORD': 'root',
+        'HOST': 'localhost',
         'PORT': 5432,
     }
 }
