@@ -17,11 +17,13 @@ Install requirements.txt:
 
 ``` $ pip install -r requirements.txt ```
 
-Run Migrations from service_TM folder:
+Run Migrations and fixture from service_TM folder:
 
 ``` python manage.py makemigrations ```
 
-``` pýthon manage.py migrate ```
+``` python manage.py migrate ```
+
+```python manage.py loaddata fixture.json```
 
 Run Django API from service_TM folder:
 
@@ -38,37 +40,102 @@ Run Django API from service_TM folder:
 - Response format:
 ``` [
     {
-        "topic": {
-            "id": 1,
-            "topic_number": 1,
-            "corpus_number": 1,
-            "name": "Python",
-            "keywords": [
-                {
-                    "id": 1,
-                    "name": "django",
-                    "weight": 0.02,
-                    "topic_id": 1
-                },
-                {
-                    "id": 2,
-                    "name": "framework",
-                    "weight": 0.22,
-                    "topic_id": 1
-                },
-                ...
-            ]
-        }
+        "id": 1,
+        "topic_number": 0,
+        "lda_model": 1,
+        "name": null,
+        "keyword_topic": [
+            {
+                "id": 1,
+                "name": "ad",
+                "weight": 0.00999999977648258
+            },
+            {
+                "id": 2,
+                "name": "food",
+                "weight": 0.00999999977648258
+            },
+            {
+                "id": 3,
+                "name": "ads",
+                "weight": 0.00999999977648258
+            },
+            ...
+        ]
     },
     {
-        "topic": {
-            "id": 2,
-            "topic_number": 2,
-            "corpus_number": 1,
-            "name": "Ruby",
-            "keywords": []
-        }
-    }
+        "id": 2,
+        "topic_number": 1,
+        "lda_model": 1,
+        "name": null,
+        "keyword_topic": [
+            {
+                "id": 6,
+                "name": "say",
+                "weight": 0.0299999993294477
+            },
+            {
+                "id": 7,
+                "name": "us",
+                "weight": 0.00999999977648258
+            },
+            ...
+        ]
+    },
+    ...
+    
+]
+``` 
+- methods allowed: POST
+- Request: 
+``` 
+{
+	"topic_number": 1,
+	"lda_model_filename": "lda_01_20000.model",
+	"topic_name": "topic1"
+}
+```
+- Response: Status message
+- Response format:
+```
+- HTTP_200_OK: {"New Topic added successfully"}
+- HTTP_500_INTERNAL_SERVER_ERROR: {<specific exception>}
+- HTTP_400_BAD_REQUEST: {"Bad Request, check sent parameters"}
+```
+
+- methods allowed: PUT
+- Request: empty
+- Action: save in database topics and keywords for LDA model marked as newest in database.
+- Response: List of data saved in database
+- Response format: 
+``` 
+[
+    {
+        "topic_number": 0,
+        "keywords": [
+            {
+                "weight": 0.009595467709004879,
+                "name": "ad"
+            },
+            {
+                "weight": 0.008851521648466587,
+                "name": "food"
+            },
+            {
+                "weight": 0.00771958427503705,
+                "name": "ads"
+            },
+            {
+                "weight": 0.006286182440817356,
+                "name": "advertise"
+            },
+            {
+                "weight": 0.005742626264691353,
+                "name": "pope"
+            }
+        ],
+        "lda_model": "lda_03_22292_20_.model"
+    },
     ...
 ]
 ``` 
@@ -108,32 +175,41 @@ Run Django API from service_TM folder:
 - Response format:
 ``` [
     {
-        "topic": {
-            "id": 1,
-            "user_id": 1,
-            "topic_id": 1,
-            "keywords": [
-                {
-                    "id": 1,
-                    "name": "django",
-                    "weight": 0.02,
-                    "topic_id": 1
-                },
-                {
-                    "id": 2,
-                    "name": "framework",
-                    "weight": 0.22,
-                    "topic_id": 1
-                },
-                {
-                    "id": 3,
-                    "name": "language",
-                    "weight": 0.29,
-                    "topic_id": 1
-                },
-                   ...
-            ]
-        }
-    }
+        "id": 1,
+        "topic_number": 0,
+        "lda_model": 1,
+        "name": null,
+        "keyword_topic": [
+            {
+                "id": 1,
+                "name": "ad",
+                "weight": 0.00999999977648258
+            },
+            {
+                "id": 2,
+                "name": "food",
+                "weight": 0.00999999977648258
+            },
+            ...
+        ]
+    },
+    ...
 ]
+```
+
+- methods allowed: PUT
+- action: update topics related to certain user
+- Request: 
+``` 
+{
+	"user_id": 12
+	"user_topics_id": [1, 18]
+}
+```
+- Response: Status message
+- Response format:
+```
+- HTTP_200_OK: {"Topics updated successfully"}
+- HTTP_500_INTERNAL_SERVER_ERROR: {<specific exception>}
+- HTTP_400_BAD_REQUEST: {"Bad Request, check sent parameters"}
 ```
