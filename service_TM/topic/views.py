@@ -25,11 +25,12 @@ class TopicViewSet(viewsets.ViewSet):
 
     @staticmethod
     def create(request):
-        if ('topic_number' and 'corpus_number' and 'topic_name') in request.data:
+        if ('topic_number' and 'lda_model_filename' and 'topic_name') in request.data:
             try:
                 new_topic_data = request.data
+                lda_model_instance = LdaModel.objects.get(filename=new_topic_data['lda_model_filename'])
                 new_topic = Topic(topic_number=new_topic_data['topic_number'],
-                                  corpus_number=new_topic_data['corpus_number'],
+                                  lda_model=lda_model_instance,
                                   name=new_topic_data['topic_name'])
                 new_topic.save()
                 response_message = {"New Topic added successfully"}
@@ -150,10 +151,10 @@ class TopicUserViewSet(viewsets.ViewSet):
 
     @staticmethod
     def update(request, pk=None):
-        if ('topic_id' and 'user_topics_id') in request.data:
+        if ('user_id' and 'user_topics_id') in request.data:
             try:
                 data = request.data
-                older_topics = TopicUser.objects.filter(user_id=1).values_list('topic_id', flat=True)
+                older_topics = TopicUser.objects.filter(user_id=data['user_id']).values_list('topic_id', flat=True)
                 updated_topics = data["user_topics_id"]
 
                 # adding new topics that didn't exist
@@ -165,7 +166,7 @@ class TopicUserViewSet(viewsets.ViewSet):
                 # deleting topics
                 for old_topic_id in older_topics:
                     if old_topic_id not in updated_topics:
-                        topic_user_instance = TopicUser.objects.get(id=old_topic_id)
+                        topic_user_instance = TopicUser.objects.get(user_id=data['user_id'], topic_id=old_topic_id)
                         topic_user_instance.delete()
                 response_message = {"Topics updated successfully!"}
                 response_status = status.HTTP_200_OK

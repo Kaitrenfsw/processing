@@ -8,9 +8,6 @@ class TopicSerializer(serializers.ModelSerializer):
         model = Topic
         fields = '__all__'
 
-    def update(self, instance, validated_data):
-        return ":)"
-
 
 class KeywordSerializer(serializers.ModelSerializer):
     class Meta:
@@ -29,5 +26,5 @@ class TopicKeywordSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Topic
-        fields = ('id', 'topic_number', 'corpus_number', 'name', 'keyword_topic')
+        fields = ('id', 'topic_number', 'lda_model', 'name', 'keyword_topic')
 
