@@ -1,32 +1,15 @@
 import os
-import glob
-import errno
 import gensim
 from gensim import corpora
 from .models import LdaModel
 
 
-
-def modelTrainer(action, new_docs):
-    # Currently the trainer is fed reading a set of files in .txt format
-    # Change path directory before run the trainer
-    ####################################################################################################
-    path = '/home/simon/Desktop/tech_news/corpus/*.txt'
-    files = glob.glob(path)
-    news = []
-    for file_path in files:
-        try:
-            with open(file_path, mode='r') as new:
-                news.append(new.read())
-        except IOError as exc:
-            if exc.errno != errno.EISDIR:  # Do not fail if a directory is found, just ignore it.
-                raise
+def update_newest_model(data_array):
 
     news_tokenized = []
-    for new in news:
-        news_tokenized.append(new.split())
-    number_documents = len(news_tokenized)
-    ####################################################################################################
+    print(data_array)
+    for new in data_array:
+        news_tokenized.append(new['text'].split())
 
     # Creating the term dictionary of our courpus, where every unique term is assigned an index
     dictionary = corpora.Dictionary(news_tokenized)
@@ -34,27 +17,25 @@ def modelTrainer(action, new_docs):
     # Converting list of documents (corpus) into Document Term Matrix using dictionary prepared above.
     doc_term_matrix = [dictionary.doc2bow(doc) for doc in news_tokenized]
 
-    # Creating the object for LDA model using gensim library
-    lda_multicore = gensim.models.ldamulticore.LdaMulticore
-    num_topics = 20
-    workers = 3
+    # Getting latest (newest) model
+    dirname = os.path.dirname(__file__)
+    latest_model = LdaModel.objects.get(newest=True)
+    filename = os.path.join(dirname, 'lda_model/' + latest_model.filename)
 
-    if action == 'update':
-        latest_model = LdaModel.objects.get(newest=True)
-        model_path = "lda_model/"
-        lda_instance = lda_multicore.load(model_path + latest_model.name)
-        #lda_instance.update(corpus=doc_term_matrix)
-        #filename = "lda_model/lda_" + str(latest_model.pk + 1) + "_" + str(number_documents) + "_" + str(num_topics) + "_.model"
-        #lda_instance.save(filename)
-        print(lda_instance.print_topics(num_topics=20, num_words=5))
-    if action == 'create':
-        # Running and Training LDA model on the document term matrix.
-        lda_instance = lda_multicore(corpus=doc_term_matrix, num_topics=num_topics,
-                                     id2word=dictionary, passes=50, workers=workers)
-        # Filename for LDA model
-        number = LdaModel.objects.get(newest=True).pk + 1
-        filename = "lda_model/lda_" + str(number) + "_" + str(number_documents) + "_" + str(num_topics) + "_.model"
-        lda_instance.save(filename)
+    # Creating the object for LDA model
+    lda_multicore = gensim.models.ldamulticore.LdaMulticore
+
+    lda_instance = lda_multicore.load(filename)
+    lda_instance.update(corpus=doc_term_matrix)
+    new_filename = "lda_" + str(latest_model.pk) + ".model"
+    new_file_path = os.path.join(dirname, 'lda_model/' + new_filename)
+    lda_instance.save(new_file_path)
+    latest_model.newest = False
+    latest_model.save()
+    updated_model = LdaModel(filename=new_filename)
+    updated_model.save()
+
+    return new_filename
 
 
 def get_topics():
@@ -86,6 +67,5 @@ def get_topics():
         topics_list.append(topic_dict)
 
     return topics_list
-
 
 

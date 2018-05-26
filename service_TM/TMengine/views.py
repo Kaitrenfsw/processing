@@ -1,6 +1,7 @@
 from topic.models import Topic, Keyword
 from topic.serializers import TopicSerializer, KeywordSerializer
-from rest_framework import viewsets
+from TMengine.engine_trainer import update_newest_model
+from rest_framework import viewsets, status
 from rest_framework.response import Response
 
 
@@ -20,7 +21,16 @@ class LdaModelViewSet(viewsets.ViewSet):
 
     @staticmethod
     def update(request, pk=None):
-        return Response(data={":)"})
+        data = request.data
+        try:
+            new_name = update_newest_model(data)
+            response_message = {"Model updated successfully!, new filename: " + new_name}
+            status_message = status.HTTP_200_OK
+        except Exception as e:
+            response_message = {e}
+            status_message = status.HTTP_500_INTERNAL_SERVER_ERROR
+        return Response(data=response_message,
+                        status=status_message)
 
     @staticmethod
     def partial_update(request, pk=None):
@@ -34,4 +44,5 @@ class LdaModelViewSet(viewsets.ViewSet):
 lda_model_list = LdaModelViewSet.as_view({
     'get': 'list',
     'post': 'create',
+    'put': 'update',
 })
