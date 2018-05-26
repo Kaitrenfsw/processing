@@ -7,7 +7,6 @@ from .models import LdaModel
 def update_newest_model(data_array):
 
     news_tokenized = []
-    print(data_array)
     for new in data_array:
         news_tokenized.append(new['text'].split())
 
