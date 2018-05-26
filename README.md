@@ -213,3 +213,34 @@ Run Django API from service_TM folder:
 - HTTP_500_INTERNAL_SERVER_ERROR: {<specific exception>}
 - HTTP_400_BAD_REQUEST: {"Bad Request, check sent parameters"}
 ```
+
+
+###LdaModel
+
+- methods allowed: PUT
+- action: update LDA model, save name and change status to newest
+- Request: New texts to update model
+```
+[
+    {
+        "id": 7,
+        "topic_number": 6,
+        "lda_model": 1,
+        "name": null,
+        "text": "kjdnsakfas"
+    },
+    {
+        "id": 8,
+        "topic_number": 7,
+        "lda_model": 1,
+        "name": null,
+        "text": "dklsajkfnlaskfl"
+    }
+]
+```
+- Response: Status message
+- Response format:
+```
+- HTTP_200_OK: {"Model updated successfully!, new filename: " + new_name}}
+- HTTP_500_INTERNAL_SERVER_ERROR: {<specific exception>}
+```
