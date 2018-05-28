@@ -96,7 +96,7 @@ DATABASES = {
         'NAME': 'kompaz',
         'USER': 'postgres',
         'PASSWORD': 'root',
-        'HOST': 'localhost',
+        'HOST': 'db_processing',
         'PORT': 5432,
     }
 }

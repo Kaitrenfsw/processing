@@ -1,17 +1,25 @@
 version: '3'
 
 services:
-  db:
-    image: postgres
-
-  web:
+  db_processing:
+    image: postgres:9.6
+    networks:
+      - shared
+  procesamiento:
     build: .
     command: python3 service_TM/manage.py makemigrations
     command: python3 service_TM/manage.py migrate
     command: python3 service_TM/manage.py runserver 0.0.0.0:8000
     volumes:
       - .:/code
+    networks:
+      - shared      
     ports:
-      - "8000:8000"
+      - "3000:8000"
     depends_on:
-      - db
+      - db_processing
+
+networks:
+  shared: 
+    external:
+      name: shared
