@@ -7,7 +7,7 @@ from .models import LdaModel
 def update_newest_model(data_array):
 
     news_tokenized = []
-    for new in data_array:
+    for new in data_array['documents']:
         news_tokenized.append(new['text'].split())
 
     # Creating the term dictionary of our courpus, where every unique term is assigned an index
