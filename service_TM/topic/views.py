@@ -122,10 +122,10 @@ class TopicUserViewSet(viewsets.ViewSet):
 
     @staticmethod
     def list(request):
-        if 'user_id' in request.data:
+        if "user_id" in request.data:
             try:
                 user_info = request.data
-                user_topics = TopicUser.objects.filter(user_id=user_info["user_id"]).values_list('id')
+                user_topics = TopicUser.objects.filter(user_id=user_info["user_id"]).values_list('topic_id')
                 topics = Topic.objects.filter(id__in=user_topics)
                 response_message = []
                 for topic in topics:
@@ -133,13 +133,13 @@ class TopicUserViewSet(viewsets.ViewSet):
                     response_message.append(serialized_topic)
                 response_status = status.HTTP_200_OK
             except Exception as e:
-                response_message = {"Exception raised" : e}
+                response_message = {"Exception raised": e}
                 response_status = status.HTTP_500_INTERNAL_SERVER_ERROR
         else:
             response_message = {"Bad Request, check sent parameters"}
             response_status = status.HTTP_400_BAD_REQUEST
 
-        return Response(data=response_message, status=response_status)
+        return Response(data=response_message, status=response_status, content_type='application/json')
 
     @staticmethod
     def create(request):
