@@ -49,7 +49,7 @@ def get_topics():
     model = lda_multicore.load(filename)
 
     # Getting topics from model
-    topics = model.show_topics(num_topics=20, num_words=5, formatted=False)
+    topics = model.show_topics(num_topics=-1, num_words=10, formatted=False)
 
     # transform to json format
     topics_list = []
