@@ -8,14 +8,11 @@ class TopicSerializer(serializers.ModelSerializer):
         model = Topic
         fields = '__all__'
 
-    def update(self, instance, validated_data):
-        return ":)"
-
 
 class KeywordSerializer(serializers.ModelSerializer):
     class Meta:
         model = Keyword
-        fields = '__all__'
+        fields = ('id', 'name', 'weight')
 
 
 class TopicUserSerializer(serializers.ModelSerializer):
@@ -23,4 +20,11 @@ class TopicUserSerializer(serializers.ModelSerializer):
         model = TopicUser
         fields = '__all__'
 
+
+class TopicKeywordSerializer(serializers.ModelSerializer):
+    keyword_topic = KeywordSerializer(many=True)
+
+    class Meta:
+        model = Topic
+        fields = ('id', 'topic_number', 'lda_model', 'name', 'keyword_topic')
 

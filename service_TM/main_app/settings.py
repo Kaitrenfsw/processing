@@ -44,6 +44,7 @@ INSTALLED_APPS = [
 
     # internal_apps
     'topic',
+    'TMengine',
 ]
 
 MIDDLEWARE = [
@@ -94,8 +95,8 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'postgres',
         'USER': 'postgres',
-        'PASSWORD': 'postgres',
-        'HOST': 'db',
+        'PASSWORD': 'root',
+        'HOST': 'db_processing',
         'PORT': 5432,
     }
 }
