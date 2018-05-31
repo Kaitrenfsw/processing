@@ -13,7 +13,7 @@ services:
     networks:
       - shared      
     ports:
-      - "3001:8000"
+      - "8000:8000"
     depends_on:
       - db_processing
 
