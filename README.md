@@ -1,8 +1,16 @@
 # Topics administration API
+Database: Postgres  9.5.12>=
 
 ## How to Run?
 
-Database: Postgres  9.5.12>=
+## Running with Docker:
+
+``` $ docker-compose up```
+
+Run fixture in container to load data:
+
+``` docker-compose exec procesamiento python3 service_TM/manage.py loaddata service_TM/fixture.json```
+
 
 ### Linux/MacOS
 
@@ -32,7 +40,7 @@ Run Django API from service_TM folder:
 
 #API Endpoints:
 
-#####Topic: [http://127.0.0.1:8000/topic/](http://127.0.0.1:8000/topic/)
+##### Topic: [http://127.0.0.1:8000/topic/](http://127.0.0.1:8000/topic/)
 
 - methods allowed: GET
 - Request: empty
@@ -140,7 +148,7 @@ Run Django API from service_TM folder:
 ]
 ``` 
 
-#####Keyword: [http://127.0.0.1:8000/keyword/](http://127.0.0.1:8000/keyword/)
+##### Keyword: [http://127.0.0.1:8000/keyword/](http://127.0.0.1:8000/keyword/)
 
 - methods allowed: GET
 - Request: empty
@@ -162,7 +170,7 @@ Run Django API from service_TM folder:
     ...
 ]
 ```
-#####TopicUser: [http://127.0.0.1:8000/topicUser/](http://127.0.0.1:8000/topicUser/)
+##### TopicUser: [http://127.0.0.1:8000/topicUser/](http://127.0.0.1:8000/topicUser/)
 
 - methods allowed: POST
 - Request: 
@@ -215,7 +223,7 @@ Run Django API from service_TM folder:
 ```
 
 
-###LdaModel
+### LdaModel
 
 - methods allowed: PUT
 - action: update LDA model, save name and change status to newest
