@@ -4,11 +4,11 @@ from gensim import corpora
 from .models import LdaModel
 
 
-def update_newest_model(data_array):
+def update_or_create_newest_model(action, data_array):
 
     news_tokenized = []
-    for new in data_array['documents']:
-        news_tokenized.append(new['text'].split())
+    for new in data_array:
+        news_tokenized.append(new.split())
 
     # Creating the term dictionary of our courpus, where every unique term is assigned an index
     dictionary = corpora.Dictionary(news_tokenized)
@@ -20,12 +20,22 @@ def update_newest_model(data_array):
     dirname = os.path.dirname(__file__)
     latest_model = LdaModel.objects.get(newest=True)
     filename = os.path.join(dirname, 'lda_model/' + latest_model.filename)
-
     # Creating the object for LDA model
     lda_multicore = gensim.models.ldamulticore.LdaMulticore
 
-    lda_instance = lda_multicore.load(filename)
-    lda_instance.update(corpus=doc_term_matrix)
+    if action == "update":
+        lda_instance = lda_multicore.load(filename)
+        lda_instance.update(corpus=doc_term_matrix)
+    if action == "create":
+        num_topics = 100
+        workers = 3
+        passes = 10
+        lda_instance = lda_multicore(corpus=doc_term_matrix,
+                                     num_topics=num_topics,
+                                     id2word=dictionary,
+                                     workers=workers,
+                                     passes=passes)
+
     new_filename = "lda_" + str(latest_model.pk) + ".model"
     new_file_path = os.path.join(dirname, 'lda_model/' + new_filename)
     lda_instance.save(new_file_path)

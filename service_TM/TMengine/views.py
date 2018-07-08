@@ -1,6 +1,6 @@
-from topic.models import Topic, Keyword
+from new.models import New
 from topic.serializers import TopicSerializer, KeywordSerializer
-from TMengine.engine_trainer import update_newest_model
+from TMengine.engine_trainer import update_or_create_newest_model
 from rest_framework import viewsets, status
 from rest_framework.response import Response
 
@@ -13,7 +13,17 @@ class LdaModelViewSet(viewsets.ViewSet):
 
     @staticmethod
     def create(request):
-        return Response(data={":)"})
+        data = request.data
+        try:
+            news = list(New.objects.all().values_list('full_text', flat=True))
+            new_name = update_or_create_newest_model(data["action"], news)
+            response_message = {"New Model created successfully!, new filename: " + new_name}
+            status_message = status.HTTP_200_OK
+        except Exception as e:
+            response_message = {e}
+            status_message = status.HTTP_500_INTERNAL_SERVER_ERROR
+        return Response(data=response_message,
+                        status=status_message)
 
     @staticmethod
     def retrieve(request, pk=None):
@@ -23,7 +33,8 @@ class LdaModelViewSet(viewsets.ViewSet):
     def update(request, pk=None):
         data = request.data
         try:
-            new_name = update_newest_model(data)
+            news = list(New.objects.all().values_list('full_text', flat=True))
+            new_name = update_or_create_newest_model(data["action"], news)
             response_message = {"Model updated successfully!, new filename: " + new_name}
             status_message = status.HTTP_200_OK
         except Exception as e:
@@ -42,7 +53,6 @@ class LdaModelViewSet(viewsets.ViewSet):
 
 
 lda_model_list = LdaModelViewSet.as_view({
-    'get': 'list',
-    'post': 'create',
     'put': 'update',
+    'post': 'create',
 })
