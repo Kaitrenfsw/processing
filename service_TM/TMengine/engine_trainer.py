@@ -1,6 +1,6 @@
 import os
 import gensim
-from gensim import corpora
+from gensim import corpora, utils
 from .models import LdaModel
 
 
@@ -66,5 +66,32 @@ def get_topics():
         topics_list.append(topic_dict)
 
     return topics_list
+
+
+def document_classifier(document):
+
+    new_tokenized = [document.split()]
+    print(new_tokenized)
+    # Creating the term dictionary of our courpus, where every unique term is assigned an index
+    dictionary = corpora.Dictionary(new_tokenized)
+
+    # Converting list of documents (corpus) into Document Term Matrix using dictionary prepared above.
+    doc_term_matrix = [dictionary.doc2bow(doc) for doc in new_tokenized]
+
+    # Getting latest (newest) model
+    dirname = os.path.dirname(__file__)
+    latest_model = LdaModel.objects.get(newest=True)
+    filename = os.path.join(dirname, 'lda_model/' + latest_model.filename)
+
+    # Creating the object for LDA model and getting the classification
+    lda_multicore = gensim.models.ldamulticore.LdaMulticore
+    lda_instance = lda_multicore.load(filename)
+    classification = lda_instance.get_document_topics(bow=doc_term_matrix[0])
+    print(classification)
+
+    # select the topic with maximum probability
+    
+
+    return classification[0]
 
 
