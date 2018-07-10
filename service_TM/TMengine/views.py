@@ -1,5 +1,3 @@
-from topic.models import Topic, Keyword
-from topic.serializers import TopicSerializer, KeywordSerializer
 from TMengine.engine_trainer import update_newest_model, document_classifier
 from rest_framework import viewsets, status
 from rest_framework.response import Response
@@ -14,7 +12,8 @@ class LdaModelViewSet(viewsets.ViewSet):
     @staticmethod
     def create(request):
         data = request.data
-        response_message = document_classifier(data["text"])
+        print(data["document"][0])
+        response_message = document_classifier(data["document"][0])
         return Response(data=response_message)
 
     @staticmethod
@@ -42,10 +41,17 @@ class LdaModelViewSet(viewsets.ViewSet):
     def destroy(request, pk=None):
         return Response(data={":)"})
 
+    @staticmethod
+    def classify_new(request):
+        data = request.data
+        print(data["documents"][0])
+        response_message = document_classifier(data["documents"][0]["text"])
+        return Response(data=response_message)
+
 
 lda_model_list = LdaModelViewSet.as_view({
     'get': 'list',
-    'post': 'create',
+    'post': 'classify_new',
     'put': 'update',
 })
 

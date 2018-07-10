@@ -86,12 +86,18 @@ def document_classifier(document):
     # Creating the object for LDA model and getting the classification
     lda_multicore = gensim.models.ldamulticore.LdaMulticore
     lda_instance = lda_multicore.load(filename)
+
+    # Classification format [(<topic number>, <percentage>), ...]
     classification = lda_instance.get_document_topics(bow=doc_term_matrix[0])
     print(classification)
 
-    # select the topic with maximum probability
-    
+    # formatting response message:
+    response_message = {
+        'id_model': latest_model.pk,
+        'model_used': latest_model.filename,
+        'classification': classification
+    }
+    return response_message
 
-    return classification[0]
 
 

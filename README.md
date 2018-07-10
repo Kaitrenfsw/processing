@@ -252,3 +252,38 @@ Run Django API from service_TM folder:
 - HTTP_200_OK: {"Model updated successfully!, new filename: " + new_name}}
 - HTTP_500_INTERNAL_SERVER_ERROR: {<specific exception>}
 ```
+
+- methods allowed: POST
+- action: Classify a new into different topics
+- Request: 
+```
+
+{
+    "date": "<date>",
+    "doc_count": "<number of documents>",
+    "documents": [
+        {
+            "title": "<document title>",
+            "url": "<document url>",
+            "site": "<site url>",
+            "site_name": "<site name>",
+            "published": "<date>",
+            "main_image": "<image url>",
+            "text": "Lorem ipsum..."
+        }
+    ]
+} 
+```
+Response format:
+```
+{
+    "id_model": 1,
+    "model_used": "LDA_100_topics_28_05_2018_passes_20.model",
+    "classification": [
+        [
+            81,
+            0.6700000166893005
+        ],...
+    ]
+}
+```
