@@ -18,7 +18,7 @@ def update_or_create_newest_model(action, data_array):
 
     # Getting latest (newest) model
     dirname = os.path.dirname(__file__)
-    latest_model = LdaModel.objects.get(newest=True)
+    latest_model = LdaModel.objects.get(in_use=True)
     filename = os.path.join(dirname, 'lda_model/' + latest_model.filename)
     # Creating the object for LDA model
     lda_multicore = gensim.models.ldamulticore.LdaMulticore
@@ -28,7 +28,7 @@ def update_or_create_newest_model(action, data_array):
         lda_instance.update(corpus=doc_term_matrix)
     if action == "create":
         num_topics = 100
-        workers = 3
+        workers = 1
         passes = 10
         lda_instance = lda_multicore(corpus=doc_term_matrix,
                                      num_topics=num_topics,
@@ -44,6 +44,8 @@ def update_or_create_newest_model(action, data_array):
     updated_model = LdaModel(filename=new_filename)
     updated_model.save()
 
+    # comparar con la instancia vieja y ver cual queda en uso en base a metricas
+    # en caso de quedar la nueva, ver si existen nuevos topicos a agregar a la bd
     return new_filename
 
 
