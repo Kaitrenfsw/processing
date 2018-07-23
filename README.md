@@ -226,25 +226,10 @@ Run Django API from service_TM folder:
 ### LdaModel
 
 - methods allowed: PUT
-- action: update LDA model, save name and change status to newest
-- Request: New texts to update model
+- action: update LDA model, save filename, change status to newest and save new topics
+- Request: Empty
 ```
-[
-    {
-        "id": 7,
-        "topic_number": 6,
-        "lda_model": 1,
-        "name": null,
-        "text": "kjdnsakfas"
-    },
-    {
-        "id": 8,
-        "topic_number": 7,
-        "lda_model": 1,
-        "name": null,
-        "text": "dklsajkfnlaskfl"
-    }
-]
+{}
 ```
 - Response: Status message
 - Response format:

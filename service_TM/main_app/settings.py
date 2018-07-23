@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     # internal_apps
     'topic',
     'TMengine',
+    'new',
 ]
 
 MIDDLEWARE = [

@@ -17,6 +17,7 @@ from django.contrib import admin
 from django.conf.urls import url, include
 from topic import views as topic_views
 from TMengine import views as lda_views
+from new import views as new_views
 
 
 urlpatterns = [
@@ -25,5 +26,6 @@ urlpatterns = [
     url(r'^topicUser/$', topic_views.topicUser_list, name='topicUser-API'),
     url(r'^keyword/$', topic_views.keyword_list, name='keyword-API'),
     url(r'^ldamodel/$', lda_views.lda_model_list, name='lda-model-API'),
+    url(r'^new/$', new_views.new_list, name='new-API'),
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
 ]

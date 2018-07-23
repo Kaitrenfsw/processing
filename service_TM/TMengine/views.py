@@ -1,4 +1,7 @@
-from TMengine.engine_trainer import update_newest_model, document_classifier
+from topic.models import Topic, Keyword
+from TMengine.models import LdaModel
+from new.models import New
+from TMengine.engine_trainer import update_model
 from rest_framework import viewsets, status
 from rest_framework.response import Response
 
@@ -11,10 +14,7 @@ class LdaModelViewSet(viewsets.ViewSet):
 
     @staticmethod
     def create(request):
-        data = request.data
-        print(data["document"][0])
-        response_message = document_classifier(data["document"][0])
-        return Response(data=response_message)
+        return Response(data={":)"})
 
     @staticmethod
     def retrieve(request, pk=None):
@@ -22,10 +22,20 @@ class LdaModelViewSet(viewsets.ViewSet):
 
     @staticmethod
     def update(request, pk=None):
-        data = request.data
         try:
-            new_name = update_newest_model(data)
-            response_message = {"Model updated successfully!, new filename: " + new_name}
+            news = list(New.objects.all().values_list('text', flat=True))
+            new_filename, new_topics = update_model(news)
+            ldamodel_instance = LdaModel.objects.get(filename=new_filename)
+            for topic in new_topics:
+                topic_instance = Topic(topic_number=topic['topic_number'],
+                                       lda_model=ldamodel_instance)
+                topic_instance.save()
+                for keyword in topic["keywords"]:
+                    keyword_instance = Keyword(name=keyword['name'],
+                                               weight=keyword['weight'],
+                                               topic_id=topic_instance)
+                    keyword_instance.save()
+            response_message = {"Model updated successfully!, new filename: " + new_filename}
             status_message = status.HTTP_200_OK
         except Exception as e:
             response_message = {e}
@@ -41,17 +51,8 @@ class LdaModelViewSet(viewsets.ViewSet):
     def destroy(request, pk=None):
         return Response(data={":)"})
 
-    @staticmethod
-    def classify_new(request):
-        data = request.data
-        print(data["documents"][0])
-        response_message = document_classifier(data["documents"][0]["text"])
-        return Response(data=response_message)
-
 
 lda_model_list = LdaModelViewSet.as_view({
-    'get': 'list',
-    'post': 'classify_new',
     'put': 'update',
 })
 
