@@ -54,5 +54,4 @@ class LdaModelViewSet(viewsets.ViewSet):
 
 lda_model_list = LdaModelViewSet.as_view({
     'put': 'update',
-    'post': 'create',
 })
