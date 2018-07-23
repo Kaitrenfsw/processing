@@ -130,12 +130,12 @@ def classify_new(document):
     lda_instance = lda_multicore.load(filename)
 
     # Classification format [(<topic number>, <percentage>), ...]
-    classification = lda_instance.get_document_topics(bow=doc_term_matrix[0])
+    classification = lda_instance.get_document_topics(bow=doc_term_matrix[0], minimum_probability=0.5)
 
     # formatting response message:
     classification = {
         'id_model': latest_model.pk,
-        'classification': classification
+        'classifications': classification
     }
     return classification
 
