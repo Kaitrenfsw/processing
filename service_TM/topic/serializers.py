@@ -1,6 +1,5 @@
 from topic.models import Topic, Keyword, TopicUser
 from rest_framework import serializers
-from rest_framework.response import Response
 
 
 class TopicSerializer(serializers.ModelSerializer):
