@@ -18,3 +18,4 @@ class NewClassification(models.Model):
     classification = models.FloatField()
     new_id = models.ForeignKey(New, on_delete=models.CASCADE, related_name='new_classification')
     topic_id = models.ForeignKey(Topic, on_delete=models.CASCADE, related_name='topic_new')
+

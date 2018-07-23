@@ -2,7 +2,7 @@ from .serializers import PreprocessedDataSerializer, NewClassifiedSerializer
 from rest_framework import viewsets, status
 from rest_framework.response import Response
 from TMengine.engine_trainer import classify_new
-from new.models import NewClassification
+from new.models import NewClassification, New
 from topic.models import Topic
 from TMengine.models import LdaModel
 
@@ -11,7 +11,8 @@ class NewViewSet(viewsets.ViewSet):
 
     @staticmethod
     def list(request):
-        news = NewClassification.objects.all()
+        news = New.objects.all()
+        print(news)
         response_json = []
         response_status = ""
         try:
