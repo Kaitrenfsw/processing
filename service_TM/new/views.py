@@ -1,19 +1,22 @@
-from .models import New
-from .serializers import NewSerializer
+from .serializers import PreprocessedDataSerializer
 from rest_framework import viewsets, status
 from rest_framework.response import Response
+from TMengine.engine_trainer import classify_new
 
 
 class NewViewSet(viewsets.ViewSet):
 
     @staticmethod
     def list(request):
+        topic_ids = request.data["topic_ids"]
+        print(topic_ids)
         return Response(data={":)"})
 
     @staticmethod
     def create(request):
         data = request.data
-        data_serialized = NewSerializer(data=data, many=True)
+        data_serialized = PreprocessedDataSerializer(data=data["documents"], many=True)
+        print(classify_new(data["documents"][0]["text"]))
         try:
             if data_serialized.is_valid():
                 data_serialized.save()
@@ -45,5 +48,6 @@ class NewViewSet(viewsets.ViewSet):
 
 
 new_list = NewViewSet.as_view({
+    'view': 'list',
     'post': 'create',
 })

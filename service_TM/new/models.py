@@ -12,5 +12,9 @@ class New(models.Model):
     site = models.TextField(null=True)
     main_image = models.TextField(null=True)
     used_to_classify = models.BooleanField(default=False)
-    topic_id = models.ManyToManyField(Topic, related_name='topic_new')
 
+
+class NewClassification(models.Model):
+    classification = models.FloatField()
+    new_id = models.ForeignKey(New, on_delete=models.CASCADE, related_name='new_classification')
+    topic_id = models.ForeignKey(Topic, on_delete=models.CASCADE, related_name='topic_new')

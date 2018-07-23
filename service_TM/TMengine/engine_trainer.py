@@ -111,20 +111,19 @@ def get_topics():
     return topics_list
 
 
-def document_classifier(document):
-
-    new_tokenized = [document.split()]
-    print(new_tokenized)
-    # Creating the term dictionary of our courpus, where every unique term is assigned an index
-    dictionary = corpora.Dictionary(new_tokenized)
-
-    # Converting list of documents (corpus) into Document Term Matrix using dictionary prepared above.
-    doc_term_matrix = [dictionary.doc2bow(doc) for doc in new_tokenized]
+def classify_new(document):
 
     # Getting latest (newest) model
     dirname = os.path.dirname(__file__)
     latest_model = LdaModel.objects.get(newest=True)
     filename = os.path.join(dirname, 'lda_model/' + latest_model.filename)
+
+    new_tokenized = [document.split()]
+    # Creating the term dictionary of our courpus, where every unique term is assigned an index
+    dictionary = corpora.Dictionary(new_tokenized)
+
+    # Converting list of documents (corpus) into Document Term Matrix using dictionary prepared above.
+    doc_term_matrix = [dictionary.doc2bow(doc) for doc in new_tokenized]
 
     # Creating the object for LDA model and getting the classification
     lda_multicore = gensim.models.ldamulticore.LdaMulticore
@@ -132,15 +131,13 @@ def document_classifier(document):
 
     # Classification format [(<topic number>, <percentage>), ...]
     classification = lda_instance.get_document_topics(bow=doc_term_matrix[0])
-    print(classification)
 
     # formatting response message:
-    response_message = {
+    classification = {
         'id_model': latest_model.pk,
-        'model_used': latest_model.filename,
         'classification': classification
     }
-    return response_message
+    return classification
 
 
 
