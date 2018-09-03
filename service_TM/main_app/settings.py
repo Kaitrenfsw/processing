@@ -42,6 +42,9 @@ INSTALLED_APPS = [
     'rest_framework',
     'corsheaders',
 
+    # celery backend
+    'django_celery_results',
+
     # internal_apps
     'topic',
     'TMengine',
@@ -94,10 +97,9 @@ WSGI_APPLICATION = 'main_app.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'postgres',
+        'NAME': 'kompaz',
         'USER': 'postgres',
-        'PASSWORD': 'root',
-        'HOST': 'db_processing',
+        'HOST': 'localhost',
         'PORT': 5432,
     }
 }
@@ -140,3 +142,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.11/howto/static-files/
 
 STATIC_URL = '/static/'
+
+# Celery config
+CELERY_BROKER_URL = 'amqp://localhost'
+CELERY_RESULT_BACKEND = 'django-db'
