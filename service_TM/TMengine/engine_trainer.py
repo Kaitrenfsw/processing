@@ -4,8 +4,10 @@ import datetime
 import collections
 from gensim import corpora
 from .models import LdaModel
+from celery import shared_task
 
 
+@shared_task
 def update_model(data_array):
 
     news_tokenized = []
@@ -74,9 +76,9 @@ def update_model(data_array):
         for keyword, weight in topic_keywords:
             keyword_dict = dict()
             keyword_dict["name"] = keyword
-            keyword_dict["weight"] = weight
+            keyword_dict["weight"] = str(round(weight, 10))
             topic_dict["keywords"].append(keyword_dict)
-        topics_list.append(topic_dict)
+            topics_list.append(topic_dict)
     return new_filename, topics_list
 
 
