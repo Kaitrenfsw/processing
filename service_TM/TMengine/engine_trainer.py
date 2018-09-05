@@ -2,9 +2,12 @@ import os
 import gensim
 import datetime
 import collections
+import urllib3
+import json
 from gensim import corpora
 from .models import LdaModel
 from celery import shared_task
+from pprint import pprint
 
 
 @shared_task
@@ -61,8 +64,10 @@ def update_model(data_array):
     # Dict key: topic number, value: frequency of condition passed across all topics
     new_topics_frequency = collections.Counter(new_topics)
     topics_to_add =[]
+    # Select new topics based in frequency of high distribution difference within a threshold
+    threshold = 25
     for topic_number, frequency in new_topics_frequency.items():
-        if frequency > 25:
+        if frequency > threshold:
             topics_to_add.append(topic_number)
 
     # Search for new topic an create json response
@@ -79,7 +84,15 @@ def update_model(data_array):
             keyword_dict["weight"] = str(round(weight, 10))
             topic_dict["keywords"].append(keyword_dict)
             topics_list.append(topic_dict)
-    return new_filename, topics_list
+    json_data = json.dumps(topics_list)
+    print(json_data)
+
+    # Send new model info and topics to business rules service
+    #http = urllib3.PoolManager()
+    #r = http.request('POST', 'http://', body=json_data,
+                    # headers={'Content-Type': 'application/json'})
+    #pprint(r.status)
+    #pprint(r.data)
 
 
 def get_topics():
