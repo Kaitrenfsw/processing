@@ -1,5 +1,3 @@
-from topic.models import Topic, Keyword
-from TMengine.models import LdaModel
 from new.models import New
 from TMengine.engine_trainer import update_model
 from rest_framework import viewsets, status
@@ -23,19 +21,12 @@ class LdaModelViewSet(viewsets.ViewSet):
     @staticmethod
     def update(request, pk=None):
         try:
+            # Get news to update LDA model
             news = list(New.objects.all().values_list('text', flat=True))
-            new_filename, new_topics = update_model(news)
-            ldamodel_instance = LdaModel.objects.get(filename=new_filename)
-            for topic in new_topics:
-                topic_instance = Topic(topic_number=topic['topic_number'],
-                                       lda_model=ldamodel_instance)
-                topic_instance.save()
-                for keyword in topic["keywords"]:
-                    keyword_instance = Keyword(name=keyword['name'],
-                                               weight=keyword['weight'],
-                                               topic_id=topic_instance)
-                    keyword_instance.save()
-            response_message = {"Model updated successfully!, new filename: " + new_filename}
+            # Trigger async task to update LDA model
+            update_model.delay(news)
+            # Response message to user
+            response_message = {"Model update start!"}
             status_message = status.HTTP_200_OK
         except Exception as e:
             response_message = {e}

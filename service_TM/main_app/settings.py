@@ -97,9 +97,9 @@ WSGI_APPLICATION = 'main_app.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'kompaz',
+        'NAME': 'postgres',
         'USER': 'postgres',
-        'HOST': 'localhost',
+        'HOST': 'db_processing',
         'PORT': 5432,
     }
 }
@@ -144,7 +144,7 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 # Celery config
-CELERY_BROKER_URL = 'amqp://localhost'
+CELERY_BROKER_URL = 'amqp://rabbitmq-docker'
 CELERY_RESULT_BACKEND = 'django-db'
 CELERY_ACCEPT_CONTENT = ['json', 'application/x-python-serialize']
 CELERY_TASK_SERIALIZER = 'json'
