@@ -2,6 +2,8 @@ from new.models import New
 from TMengine.engine_trainer import update_model
 from rest_framework import viewsets, status
 from rest_framework.response import Response
+import urllib3
+import json
 
 
 class LdaModelViewSet(viewsets.ViewSet):
@@ -24,8 +26,7 @@ class LdaModelViewSet(viewsets.ViewSet):
             # Get news to update LDA model
             news = list(New.objects.all().values_list('text', flat=True))
             # Trigger async task to update LDA model
-            update_model.delay(news)
-            # Response message to user
+            update_model(news)
             response_message = {"Model update start!"}
             status_message = status.HTTP_200_OK
         except Exception as e:

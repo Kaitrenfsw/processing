@@ -6,12 +6,15 @@ import urllib3
 import json
 from gensim import corpora
 from .models import LdaModel
+from .serializers import LdaModelSerializer
 from celery import shared_task
-from pprint import pprint
 
 
-@shared_task
+# @shared_task
 def update_model(data_array):
+
+    # HTTP pool request
+    http = urllib3.PoolManager()
 
     news_tokenized = []
     for new in data_array:
@@ -23,7 +26,7 @@ def update_model(data_array):
     # Converting list of documents (corpus) into Document Term Matrix using dictionary prepared above.
     doc_term_matrix = [dictionary.doc2bow(doc) for doc in news_tokenized]
 
-    # Getting latest (newest) model
+    # Getting latest (in_use) model
     dirname = os.path.dirname(__file__)
     latest_model = LdaModel.objects.get(in_use=True)
     latest_filepath = os.path.join(dirname, 'lda_model/' + latest_model.filename)
@@ -33,8 +36,9 @@ def update_model(data_array):
     # Loading latest model in use
     lda_instance = lda_multicore.load(latest_filepath)
     # Updating model
+    print("start update")
     lda_instance.update(corpus=doc_term_matrix)
-
+    print("finish update")
     # Save new model instance
     date_now = datetime.datetime.now().strftime("%y_%m_%d")
     new_filename = "lda_" + date_now + ".model"
@@ -46,6 +50,9 @@ def update_model(data_array):
     latest_model.save()
     updated_model = LdaModel(filename=new_filename)
     updated_model.save()
+    json_data = json.dumps(LdaModelSerializer(updated_model).data)
+    http.request('POST', 'http://business-rules:8001/ldamodel/', body=json_data,
+                 headers={'Content-Type': 'application/json'})
 
     # Compare distribution difference from each topic from latest and new model
     old_model = lda_multicore.load(latest_filepath)
@@ -85,14 +92,10 @@ def update_model(data_array):
             topic_dict["keywords"].append(keyword_dict)
             topics_list.append(topic_dict)
     json_data = json.dumps(topics_list)
-    print(json_data)
 
     # Send new model info and topics to business rules service
-    #http = urllib3.PoolManager()
-    #r = http.request('POST', 'http://', body=json_data,
-                    # headers={'Content-Type': 'application/json'})
-    #pprint(r.status)
-    #pprint(r.data)
+    http.request('POST', 'http://business-rules:8001/topic/', body=json_data,
+                 headers={'Content-Type': 'application/json'})
 
 
 def get_topics():

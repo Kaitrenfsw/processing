@@ -5,7 +5,7 @@ from rest_framework import serializers
 class TopicSerializer(serializers.ModelSerializer):
     class Meta:
         model = Topic
-        fields = '__all__'
+        fields = ('topic_number', 'lda_model', 'name')
 
 
 class KeywordSerializer(serializers.ModelSerializer):
