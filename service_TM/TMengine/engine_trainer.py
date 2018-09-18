@@ -50,9 +50,6 @@ def update_model(data_array):
     latest_model.save()
     updated_model = LdaModel(filename=new_filename)
     updated_model.save()
-    json_data = json.dumps(LdaModelSerializer(updated_model).data)
-    http.request('POST', 'http://business-rules:8001/ldamodel/', body=json_data,
-                 headers={'Content-Type': 'application/json'})
 
     # Compare distribution difference from each topic from latest and new model
     old_model = lda_multicore.load(latest_filepath)
@@ -82,15 +79,15 @@ def update_model(data_array):
     for new_topic_id in topics_to_add:
         topic_keywords = new_model.show_topic(topicid=new_topic_id, topn=10)
         topic_dict = dict()
+        topic_dict["lda_model_id"] = updated_model.pk
         topic_dict["topic_number"] = new_topic_id
-        topic_dict["lda_model"] = new_filename
         topic_dict["keywords"] = []
         for keyword, weight in topic_keywords:
             keyword_dict = dict()
             keyword_dict["name"] = keyword
             keyword_dict["weight"] = str(round(weight, 10))
             topic_dict["keywords"].append(keyword_dict)
-            topics_list.append(topic_dict)
+        topics_list.append(topic_dict)
     json_data = json.dumps(topics_list)
 
     # Send new model info and topics to business rules service
