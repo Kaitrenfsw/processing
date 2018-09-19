@@ -126,33 +126,38 @@ def get_topics():
     return topics_list
 
 
-def classify_new(document):
+def classify_new(documents):
 
     # Getting latest (newest) model
     dirname = os.path.dirname(__file__)
-    latest_model = LdaModel.objects.get(newest=True)
+    latest_model = LdaModel.objects.get(in_use=True)
     filename = os.path.join(dirname, 'lda_model/' + latest_model.filename)
-
-    new_tokenized = [document.split()]
-    # Creating the term dictionary of our courpus, where every unique term is assigned an index
-    dictionary = corpora.Dictionary(new_tokenized)
-
-    # Converting list of documents (corpus) into Document Term Matrix using dictionary prepared above.
-    doc_term_matrix = [dictionary.doc2bow(doc) for doc in new_tokenized]
 
     # Creating the object for LDA model and getting the classification
     lda_multicore = gensim.models.ldamulticore.LdaMulticore
     lda_instance = lda_multicore.load(filename)
 
-    # Classification format [(<topic number>, <percentage>), ...]
-    classification = lda_instance.get_document_topics(bow=doc_term_matrix[0], minimum_probability=0.5)
-
-    # formatting response message:
-    classification = {
-        'id_model': latest_model.pk,
-        'classifications': classification
-    }
-    return classification
+    news_classified = []
+    for document in documents:
+        new_tokenized = [document['clean_text'].split()]
+        # Creating the term dictionary of our courpus, where every unique term is assigned an index
+        dictionary = corpora.Dictionary(new_tokenized)
+        # Converting list of documents (corpus) into Document Term Matrix using dictionary prepared above.
+        doc_term_matrix = [dictionary.doc2bow(doc) for doc in new_tokenized]
+        # Classification format [(<topic number>, <percentage>), ...]
+        classifications = lda_instance.get_document_topics(bow=doc_term_matrix, minimum_probability=0.15)
+        # Retrieve id topics from business_rules service TO DO
+        document['topics'] = []
+        document['cat_date'] = datetime.datetime.now().strftime("%y_%m_%d")
+        for classification in classifications[0]:
+            document['topics'].append({'id': classification[0],
+                                       'weight': classification[1]})
+        news_classified.append(document)
+        # Send payload to Nurdata
+        # HTTP pool request
+        # http = urllib3.PoolManager()
+        # http.request('POST', 'http://business-rules:8001/topic/', body=json_data,
+          #           headers={'Content-Type': 'application/json'})
 
 
 
