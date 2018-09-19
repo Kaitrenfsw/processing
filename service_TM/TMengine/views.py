@@ -14,7 +14,18 @@ class LdaModelViewSet(viewsets.ViewSet):
 
     @staticmethod
     def create(request):
-        return Response(data={":)"})
+        try:
+            # Get news to update LDA model
+            news = list(New.objects.all().values_list('text', flat=True))
+            # Trigger async task to update LDA model
+            update_model(news)
+            response_message = {"Model update start!"}
+            status_message = status.HTTP_200_OK
+        except Exception as e:
+            response_message = {e}
+            status_message = status.HTTP_500_INTERNAL_SERVER_ERROR
+        return Response(data=response_message,
+                        status=status_message)
 
     @staticmethod
     def retrieve(request, pk=None):

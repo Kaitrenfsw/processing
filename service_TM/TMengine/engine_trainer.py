@@ -81,12 +81,12 @@ def update_model(data_array):
         topic_dict = dict()
         topic_dict["lda_model_id"] = updated_model.pk
         topic_dict["topic_number"] = new_topic_id
-        topic_dict["keywords"] = []
+        topic_dict["keyword_topic"] = []
         for keyword, weight in topic_keywords:
             keyword_dict = dict()
             keyword_dict["name"] = keyword
             keyword_dict["weight"] = str(round(weight, 10))
-            topic_dict["keywords"].append(keyword_dict)
+            topic_dict["keyword_topic"].append(keyword_dict)
         topics_list.append(topic_dict)
     json_data = json.dumps(topics_list)
 
@@ -115,14 +115,14 @@ def get_topics():
         topic_dict = dict()
         topic_dict["topic_number"] = topic[0]
         topic_dict["lda_model"] = file_instance
-        topic_dict["keywords"] = []
+        topic_dict["keyword_topic"] = []
         for keyword in topic[1]:
             keyword_dict = dict()
             keyword_dict["name"] = keyword[0]
             keyword_dict["weight"] = keyword[1]
-            topic_dict["keywords"].append(keyword_dict)
+            topic_dict["keyword_topic"].append(keyword_dict)
         topics_list.append(topic_dict)
-
+        print(topics_list)
     return topics_list
 
 
