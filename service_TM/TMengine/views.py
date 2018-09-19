@@ -2,11 +2,11 @@ from new.models import New
 from TMengine.engine_trainer import update_model
 from rest_framework import viewsets, status
 from rest_framework.response import Response
-import urllib3
-import json
+from .models import LdaModel
 
 
 class LdaModelViewSet(viewsets.ViewSet):
+    queryset = LdaModel.objects.all()
 
     @staticmethod
     def list(request):
@@ -43,9 +43,5 @@ class LdaModelViewSet(viewsets.ViewSet):
     def destroy(request, pk=None):
         return Response(data={":)"})
 
-
-lda_model_list = LdaModelViewSet.as_view({
-    'put': 'update',
-})
 
 
