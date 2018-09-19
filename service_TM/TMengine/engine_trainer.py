@@ -148,11 +148,12 @@ def classify_new(documents):
         classifications = lda_instance.get_document_topics(bow=doc_term_matrix, minimum_probability=0.15)
         # Retrieve id topics from business_rules service TO DO
         document['topics'] = []
-        document['cat_date'] = datetime.datetime.now().strftime("%y_%m_%d")
+        document['cat_date'] = datetime.datetime.now().strftime("%y-%m-%d")
         for classification in classifications[0]:
             document['topics'].append({'id': classification[0],
                                        'weight': classification[1]})
         news_classified.append(document)
+        print(news_classified)
         # Send payload to Nurdata
         # HTTP pool request
         # http = urllib3.PoolManager()
