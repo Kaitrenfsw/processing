@@ -149,16 +149,25 @@ def classify_new(documents):
         # Retrieve id topics from business_rules service TO DO
         document['topics'] = []
         document['cat_date'] = datetime.datetime.now().strftime("%y-%m-%d")
+        topic_ids = []
         for classification in classifications[0]:
             document['topics'].append({'id': classification[0],
                                        'weight': classification[1]})
-        news_classified.append(document)
-        print(news_classified)
-        # Send payload to Nurdata
+            topic_ids.append(classification[0])
         # HTTP pool request
-        # http = urllib3.PoolManager()
-        # http.request('POST', 'http://business-rules:8001/topic/', body=json_data,
-          #           headers={'Content-Type': 'application/json'})
+        http = urllib3.PoolManager()
+        # Request to business_rules
+        request = http.request('GET', 'http://business-rules:8001/ldamodelTopics/' + str(latest_model.pk),
+                               headers={'Content-Type': 'application/json'})
+        topics_data = json.loads(request.data.decode('utf-8'))
+        for topic_data in topics_data[0]:
+            for topic in document['topics']:
+                if topic_data['topic_number'] == topic['id']:
+                    topic['id'] = topic_data['id']
+
+        news_classified.append(document)
+        # Request to Nurdata
+
 
 
 
