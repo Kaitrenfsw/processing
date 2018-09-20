@@ -77,7 +77,7 @@ def update_model(data_array):
     # Search for new topic an create json response
     topics_list = []
     for new_topic_id in topics_to_add:
-        topic_keywords = new_model.show_topic(topicid=new_topic_id, topn=10)
+        topic_keywords = new_model.show_topic(topicid=new_topic_id, topn=20)
         topic_dict = dict()
         topic_dict["lda_model_id"] = updated_model.pk
         topic_dict["topic_number"] = new_topic_id
