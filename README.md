@@ -40,7 +40,7 @@ Run Django API from service_TM folder:
 
 #API Endpoints use via BFF:
 
-##### Topic: [http://127.0.0.1:8000/topic/](http://127.0.0.1:8000/topic/)
+##### Topic: [http://127.0.0.1:8000/ldamodel/](http://127.0.0.1:8000/topic/)
 
 - methods allowed: POST
 - Request: empty
