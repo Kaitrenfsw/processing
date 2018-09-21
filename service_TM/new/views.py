@@ -3,7 +3,6 @@ from rest_framework.response import Response
 from TMengine.engine_trainer import classify_new
 from new.models import NewClassification
 import requests
-import json
 
 
 class NewClassificationViewSet(viewsets.ViewSet):
@@ -15,6 +14,8 @@ class NewClassificationViewSet(viewsets.ViewSet):
 
     @staticmethod
     def create(request):
+        response_message = ""
+        status_message = ""
         if 'new_id' in request.data:
             new_id = request.data['new_id']
             print(new_id)
@@ -27,10 +28,15 @@ class NewClassificationViewSet(viewsets.ViewSet):
                 # Decode and formatting
                 documents = data_request.json()
                 new_data = documents['documents']['records']
+
                 # Classify a new
-                #classify_new(new_data)
-                response_message = {"Classification process start!"}
-                status_message = status.HTTP_200_OK
+                classify_status = classify_new(new_data)
+                if classify_status == 200:
+                    response_message = {"Classification succesfully!"}
+                    status_message = status.HTTP_200_OK
+                else:
+                    response_message = {"Internal Error" : classify_status}
+                    status_message = status.HTTP_500_INTERNAL_SERVER_ERROR
             except Exception as e:
                 response_message = {e}
                 status_message = status.HTTP_500_INTERNAL_SERVER_ERROR
