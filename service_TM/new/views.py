@@ -15,17 +15,25 @@ class NewClassificationViewSet(viewsets.ViewSet):
 
     @staticmethod
     def create(request):
-        try:
-            # Retrieve news from Nurdata
-            data_request = requests.get('http://corpus_data:4000/api/documents/?filters=[{"type": "match","field": "_id","value": "0tzE-WUBdKg8oVUDjRX3"}]')
-            documents = data_request.json()
-            new_data = documents['documents']['records']
-            classify_new(new_data)
-            response_message = {"Classification process start!"}
-            status_message = status.HTTP_200_OK
-        except Exception as e:
-            response_message = {e}
-            status_message = status.HTTP_500_INTERNAL_SERVER_ERROR
+        if 'new_id' in request.data:
+            new_id = request.data['new_id']
+            print(new_id)
+            try:
+                # Retrieve news from Nurdata
+                url = 'http://corpus_data:4000/api/documents/?filters=[{"type": "match","field": "_id","value":"'\
+                      + new_id + '"}]'
+                data_request = requests.get(url)
+
+                # Decode and formatting
+                documents = data_request.json()
+                new_data = documents['documents']['records']
+                # Classify a new
+                #classify_new(new_data)
+                response_message = {"Classification process start!"}
+                status_message = status.HTTP_200_OK
+            except Exception as e:
+                response_message = {e}
+                status_message = status.HTTP_500_INTERNAL_SERVER_ERROR
         return Response(data=response_message,
                         status=status_message)
 

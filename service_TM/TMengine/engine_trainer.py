@@ -4,6 +4,7 @@ import datetime
 import collections
 import urllib3
 import json
+import requests
 from gensim import corpora
 from .models import LdaModel
 from .serializers import LdaModelSerializer
@@ -146,38 +147,46 @@ def classify_new(documents):
         doc_term_matrix = [dictionary.doc2bow(doc) for doc in new_tokenized]
         # Classification format [(<topic number>, <percentage>), ...]
         classifications = lda_instance.get_document_topics(bow=doc_term_matrix, minimum_probability=0.15)
-        # Retrieve id topics from business_rules service TO DO
+
+        # Formatting new info JSON object
         document['topics'] = []
         document['cat_date'] = datetime.datetime.now().strftime("%d-%m-%Y")
         document['text'] = document.pop('clean_text')
         document.pop('id')
         document.pop('updated_at')
         document.pop('created_at')
-        topic_ids = []
+
+        # Create array with internal ids from topics and weight associated
         for classification in classifications[0]:
             document['topics'].append({'id': classification[0],
                                        'weight': classification[1]})
-            topic_ids.append(classification[0])
+
         # HTTP pool request
         http = urllib3.PoolManager()
-        # Request to business_rules
+        # GET Request to business_rules with topics ids
         request = http.request('GET', 'http://business-rules:8001/ldamodelTopics/'
                                + str(latest_model.pk),
                                headers={'Content-Type': 'application/json'})
         topics_data = json.loads(request.data.decode('utf-8'))
+
+        # Replace topic internal number with id from business_rules service
         for topic_data in topics_data[0]:
             for topic in document['topics']:
                 if topic_data['topic_number'] == topic['id']:
                     topic['id'] = topic_data['id']
 
+        # Request body formatting and encoding
         news_classified.append(document)
+        new_classified = dict()
+        new_classified['document'] = news_classified[0]
+        encoded_data = json.dumps(new_classified).encode('utf-8')
 
-        # Request to categorized-data service
-        encoded_data = json.dumps(news_classified[0]).encode('utf-8')
-        r = http.request('POST', 'http://categorized_data:4000/api/documents/',
-                         body=encoded_data,
-                         headers={'Content-Type': 'application/json'})
-
+        # POST Request to categorized-data service
+        request = http.request('POST', 'http://categorized_data:4000/api/documents/',
+                               body=encoded_data,
+                               headers={'Content-Type': 'application/json'})
+        print(request.status)
+        return request.status
 
 
 
