@@ -2,6 +2,8 @@ from rest_framework import viewsets, status
 from rest_framework.response import Response
 from TMengine.engine_trainer import classify_new
 from new.models import NewClassification
+import requests
+import json
 
 
 class NewClassificationViewSet(viewsets.ViewSet):
@@ -15,7 +17,10 @@ class NewClassificationViewSet(viewsets.ViewSet):
     def create(request):
         try:
             # Retrieve news from Nurdata
-            classify_new(request.data)
+            data_request = requests.get('http://corpus_data:4000/api/documents/?filters=[{"type": "match","field": "_id","value": "0tzE-WUBdKg8oVUDjRX3"}]')
+            documents = data_request.json()
+            new_data = documents['documents']['records']
+            classify_new(new_data)
             response_message = {"Classification process start!"}
             status_message = status.HTTP_200_OK
         except Exception as e:
