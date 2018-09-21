@@ -2,7 +2,7 @@ from TMengine.engine_trainer import update_model
 from rest_framework import viewsets, status
 from rest_framework.response import Response
 from .models import LdaModel
-import urllib3
+import requests
 import json
 
 
@@ -16,14 +16,16 @@ class LdaModelViewSet(viewsets.ViewSet):
     @staticmethod
     def create(request):
         try:
+            # Request to corpus_data service
+            url = 'http://corpus_data:4000/api/documents/'
+            data_request = requests.get(url)
 
             # Get news to update LDA model
-            http = urllib3.PoolManager()
-            request = http.request('GET', 'http://corpus_data:4000/api/documents/')
-            data_request = json.loads(request.data.decode('utf-8'))
+            documents = data_request.json()
             corpus = []
-            for document in data_request['documents']['records']:
+            for document in documents['documents']['records']:
                 corpus.append(document['clean_text'])
+
             # Trigger async task to update LDA model
             update_model(corpus)
             response_message = {"Model update start!"}

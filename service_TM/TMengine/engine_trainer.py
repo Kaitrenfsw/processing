@@ -21,12 +21,13 @@ def update_model(data_array):
     for new in data_array:
         news_tokenized.append(new.split())
 
+    print(news_tokenized)
     # Creating the term dictionary of our courpus, where every unique term is assigned an index
     dictionary = corpora.Dictionary(news_tokenized)
-
+    print(dictionary)
     # Converting list of documents (corpus) into Document Term Matrix using dictionary prepared above.
     doc_term_matrix = [dictionary.doc2bow(doc) for doc in news_tokenized]
-
+    print(doc_term_matrix)
     # Getting latest (in_use) model
     dirname = os.path.dirname(__file__)
     latest_model = LdaModel.objects.get(in_use=True)
@@ -37,16 +38,16 @@ def update_model(data_array):
     # Loading latest model in use
     lda_instance = lda_multicore.load(latest_filepath)
     # Updating model
-    print("start update")
+    print("Start update LDA Model" + latest_model.filename)
     lda_instance.update(corpus=doc_term_matrix)
-    print("finish update")
     # Save new model instance
-    date_now = datetime.datetime.now().strftime("%y_%m_%d")
+    date_now = datetime.datetime.now().strftime("%y_%m_%d_%H_%M_%S")
     new_filename = "lda_" + date_now + ".model"
     new_file_path = os.path.join(dirname, 'lda_model/' + new_filename)
     lda_instance.save(new_file_path)
+    print("Finish update LDA Model, New model created:" + new_filename)
 
-    # Save new data of model in DB and change flag of newest
+    # Save new data of model in DB and change flag of newest in old model
     latest_model.newest = False
     latest_model.save()
     updated_model = LdaModel(filename=new_filename)
@@ -164,10 +165,10 @@ def classify_new(documents):
         # HTTP pool request
         http = urllib3.PoolManager()
         # GET Request to business_rules with topics ids
-        request = http.request('GET', 'http://business-rules:8001/ldamodelTopics/'
-                               + str(latest_model.pk),
-                               headers={'Content-Type': 'application/json'})
-        topics_data = json.loads(request.data.decode('utf-8'))
+        request_1 = http.request('GET', 'http://business-rules:8001/ldamodelTopics/'
+                                 + str(latest_model.pk),
+                                 headers={'Content-Type': 'application/json'})
+        topics_data = json.loads(request_1.data.decode('utf-8'))
 
         # Replace topic internal number with id from business_rules service
         for topic_data in topics_data[0]:
@@ -182,11 +183,11 @@ def classify_new(documents):
         encoded_data = json.dumps(new_classified).encode('utf-8')
 
         # POST Request to categorized-data service
-        request = http.request('POST', 'http://categorized_data:4000/api/documents/',
-                               body=encoded_data,
-                               headers={'Content-Type': 'application/json'})
-        print(request.status)
-        return request.status
+        request_2 = http.request('POST', 'http://categorized_data:4000/api/documents/',
+                                 body=encoded_data,
+                                 headers={'Content-Type': 'application/json'})
+        print(request_2.status)
+        return request_2.status
 
 
 
