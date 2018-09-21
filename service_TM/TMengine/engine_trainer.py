@@ -53,6 +53,7 @@ def update_model(data_array):
 
     # Compare distribution difference from each topic from latest and new model
     old_model = lda_multicore.load(latest_filepath)
+    print(old_model.top_topics())
     new_model = lda_multicore.load(new_file_path)
     # (row -> self.num_topics, col -> other.num_topics)
     topic_diff_matrix, annotation = old_model.diff(new_model)
@@ -91,8 +92,8 @@ def update_model(data_array):
     json_data = json.dumps(topics_list)
 
     # Send new model info and topics to business rules service
-    http.request('POST', 'http://business-rules:8001/topic/', body=json_data,
-                 headers={'Content-Type': 'application/json'})
+    #http.request('POST', 'http://business-rules:8001/topic/', body=json_data,
+     #            headers={'Content-Type': 'application/json'})
 
 
 def get_topics():
