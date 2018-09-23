@@ -31,7 +31,7 @@ class NewClassificationViewSet(viewsets.ViewSet):
 
                 # Classify a new
                 classify_status = classify_new(new_data)
-                if classify_status == 200:
+                if classify_status == 201:
                     response_message = {"Classification succesfully!"}
                     status_message = status.HTTP_200_OK
                 else:

@@ -4,6 +4,7 @@ import datetime
 import collections
 import urllib3
 import json
+import random
 import requests
 from gensim import corpora
 from .models import LdaModel
@@ -83,6 +84,7 @@ def update_model(data_array):
         topic_dict = dict()
         topic_dict["lda_model_id"] = updated_model.pk
         topic_dict["topic_number"] = new_topic_id
+        topic_dict["coherence"] = str(round(random.random(), 2))
         topic_dict["keyword_topic"] = []
         for keyword, weight in topic_keywords:
             keyword_dict = dict()
@@ -109,23 +111,29 @@ def get_topics():
     model = lda_multicore.load(filename)
 
     # Getting topics from model
-    topics = model.show_topics(num_topics=-1, num_words=10, formatted=False)
+    topics = model.show_topics(num_topics=-1, num_words=20, formatted=False)
 
     # transform to json format
     topics_list = []
     for topic in topics:
         topic_dict = dict()
         topic_dict["topic_number"] = topic[0]
-        topic_dict["lda_model"] = file_instance
+        topic_dict["coherence"] = str(round(random.random(), 2))
+        topic_dict["lda_model_id"] = 1
         topic_dict["keyword_topic"] = []
         for keyword in topic[1]:
             keyword_dict = dict()
             keyword_dict["name"] = keyword[0]
-            keyword_dict["weight"] = keyword[1]
+            keyword_dict["weight"] = str(round(keyword[1], 10))
             topic_dict["keyword_topic"].append(keyword_dict)
         topics_list.append(topic_dict)
     json_data = json.dumps(topics_list)
-    return json_data
+
+    # HTTP pool request
+    http = urllib3.PoolManager()
+    # Send new model info and topics to business rules service
+    http.request('POST', 'http://business-rules:8001/topic/', body=json_data,
+                 headers={'Content-Type': 'application/json'})
 
 
 def classify_new(documents):
@@ -151,7 +159,7 @@ def classify_new(documents):
 
         # Formatting new info JSON object
         document['topics'] = []
-        document['cat_date'] = datetime.datetime.now().strftime("%d-%m-%Y")
+        document['cat_date'] = datetime.datetime.now().strftime("%d/%m/%Y")
         document['text'] = document.pop('clean_text')
         document.pop('id')
         document.pop('updated_at')
@@ -160,7 +168,7 @@ def classify_new(documents):
         # Create array with internal ids from topics and weight associated
         for classification in classifications[0]:
             document['topics'].append({'id': classification[0],
-                                       'weight': classification[1]})
+                                       'weight': str(round(classification[1], 10))})
 
         # HTTP pool request
         http = urllib3.PoolManager()
@@ -180,6 +188,7 @@ def classify_new(documents):
         news_classified.append(document)
         new_classified = dict()
         new_classified['document'] = news_classified[0]
+        print(new_classified)
         encoded_data = json.dumps(new_classified).encode('utf-8')
 
         # POST Request to categorized-data service
