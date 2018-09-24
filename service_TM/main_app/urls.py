@@ -15,17 +15,18 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.conf.urls import url, include
-from topic import views as topic_views
-from TMengine import views as lda_views
+from rest_framework import routers
 from new import views as new_views
+from TMengine import views as ldamodel_views
 
+router = routers.SimpleRouter()
+router.register(r'newclassification', new_views.NewClassificationViewSet)
+router.register(r'ldamodel', ldamodel_views.LdaModelViewSet)
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
-    url(r'^topic/$', topic_views.topic_list, name='topic-API'),
-    url(r'^topicUser/$', topic_views.topicUser_list, name='topicUser-API'),
-    url(r'^keyword/$', topic_views.keyword_list, name='keyword-API'),
-    url(r'^ldamodel/$', lda_views.lda_model_list, name='lda-model-API'),
-    url(r'^new/$', new_views.new_list, name='new-API'),
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
 ]
+
+urlpatterns += router.urls
+
