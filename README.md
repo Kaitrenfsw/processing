@@ -46,7 +46,18 @@ Run Django API from service_TM folder:
 - Request: empty
 - Response: empty
 - Response format:
-``` ["Model update start!"] STATUS CODE 200 
+``` 
+    ["Model update start!"] STATUS CODE 200 
+    [{e}] STATUS CODE 500
+```
+
+##### Topic: [http://127.0.0.1:8000/trainingStatus/](http://127.0.0.1:8000/topic/)
+
+- methods allowed: GET
+- Request: empty
+- Response: empty
+- Response format:
+``` {"id":1,"is_training":false} STATUS CODE 200 
     [{e}] STATUS CODE 500
 ```
 

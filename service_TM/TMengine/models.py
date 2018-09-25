@@ -6,3 +6,7 @@ class LdaModel(models.Model):
     creation_date = models.DateField(auto_now=True)
     newest = models.BooleanField(default=True, null=False)
     in_use = models.BooleanField(default=False, null=False)
+
+
+class TrainingStatus(models.Model):
+    is_training = models.BooleanField(default=False, null=False)
