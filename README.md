@@ -57,7 +57,8 @@ Run Django API from service_TM folder:
 - Request: empty
 - Response: empty
 - Response format:
-``` {"id":1,"is_training":false} STATUS CODE 200 
+``` 
+    {"id":1,"is_training":false} STATUS CODE 200 
     [{e}] STATUS CODE 500
 ```
 
