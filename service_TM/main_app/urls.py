@@ -22,6 +22,7 @@ from TMengine import views as ldamodel_views
 router = routers.SimpleRouter()
 router.register(r'newclassification', new_views.NewClassificationViewSet)
 router.register(r'ldamodel', ldamodel_views.LdaModelViewSet)
+router.register(r'trainingStatus', ldamodel_views.TrainingStatusViewSet)
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
