@@ -84,6 +84,7 @@ def update_model(data_array):
         topic_dict = dict()
         topic_dict["lda_model_id"] = updated_model.pk
         topic_dict["topic_number"] = new_topic_id
+        topic_dict["name"] = "New Topic"
         topic_dict["coherence"] = str(round(random.random(), 2))
         topic_dict["keyword_topic"] = []
         for keyword, weight in topic_keywords:
@@ -155,7 +156,7 @@ def classify_new(documents):
         # Converting list of documents (corpus) into Document Term Matrix using dictionary prepared above.
         doc_term_matrix = [dictionary.doc2bow(doc) for doc in new_tokenized]
         # Classification format [(<topic number>, <percentage>), ...]
-        classifications = lda_instance.get_document_topics(bow=doc_term_matrix, minimum_probability=0.1)
+        classifications = lda_instance.get_document_topics(bow=doc_term_matrix, minimum_probability=0.15)
 
         # Formatting new info JSON object
         document['topics'] = []
@@ -178,13 +179,20 @@ def classify_new(documents):
                                  headers={'Content-Type': 'application/json'})
         topics_data = json.loads(request_1.data.decode('utf-8'))
 
+        print("antes")
+        print(document['topics'])
         # Replace topic internal number with id from business_rules service
-        for topic_data in topics_data[0]:
-            for topic in document['topics']:
+        aux_document = []
+        for topic in document['topics']:
+            for topic_data in topics_data[0]:
                 if topic_data['topic_number'] == topic['id']:
                     topic['id'] = topic_data['id']
+                    aux_document.append({"id": topic_data['id'], "weight": topic['weight']})
 
+        print("despues")
+        print(aux_document)
         # Request body formatting and encoding
+        document['topics'] = aux_document
         news_classified.append(document)
         new_classified = dict()
         new_classified['document'] = news_classified[0]
