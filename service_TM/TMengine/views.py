@@ -1,14 +1,11 @@
-from TMengine.engine_trainer import update_model
+from topic.models import Topic, Keyword
+from topic.serializers import TopicSerializer, KeywordSerializer
+from TMengine.engine_trainer import update_newest_model
 from rest_framework import viewsets, status
 from rest_framework.response import Response
-from .models import LdaModel, TrainingStatus
-from .serializers import TrainingStatusSerializer
-import requests
-import time
 
 
 class LdaModelViewSet(viewsets.ViewSet):
-    queryset = LdaModel.objects.all()
 
     @staticmethod
     def list(request):
@@ -16,47 +13,26 @@ class LdaModelViewSet(viewsets.ViewSet):
 
     @staticmethod
     def create(request):
-        training_status = TrainingStatus.objects.get(pk=1)
-        training_status.is_training = True
-        training_status.save()
+        return Response(data={":)"})
+
+    @staticmethod
+    def retrieve(request, pk=None):
+        return Response(data={":)"})
+
+    @staticmethod
+    def update(request, pk=None):
+        data = request.data
         try:
-            # Request to corpus_data service
-            url = 'http://corpus_data:4000/api/documents/'
-            data_request = requests.get(url)
-
-            # Get news to update LDA model
-            documents = data_request.json()
-            corpus = []
-            for document in documents['documents']['records']:
-                corpus.append(document['clean_text'])
-
-            print(training_status.is_training)
-            # Trigger async task to update LDA model
-            update_model(corpus)
-            training_status.is_training = False
-            training_status.save()
-
-            response_message = {"Model update finished!"}
+            new_name = update_newest_model(data)
+            response_message = {"Model updated successfully!, new filename: " + new_name}
             status_message = status.HTTP_200_OK
         except Exception as e:
-
-            training_status.is_training = False
-            training_status.save()
-
             response_message = {e}
             status_message = status.HTTP_500_INTERNAL_SERVER_ERROR
         return Response(data=response_message,
                         status=status_message)
 
     @staticmethod
-    def retrieve(request, pk=None):
-        return Response(data={":)"})
-
-    @staticmethod
-    def update(request, pk=None):
-        return Response(data={":)"})
-
-    @staticmethod
     def partial_update(request, pk=None):
         return Response(data={":)"})
 
@@ -65,37 +41,8 @@ class LdaModelViewSet(viewsets.ViewSet):
         return Response(data={":)"})
 
 
-class TrainingStatusViewSet(viewsets.ViewSet):
-    queryset = TrainingStatus.objects.all()
-
-    @staticmethod
-    def list(request):
-        try:
-            training_status = TrainingStatus.objects.get(pk=1)
-            training_status_serialized = TrainingStatusSerializer(training_status).data
-            response_message = training_status_serialized
-            status_message = status.HTTP_200_OK
-        except Exception as e:
-            response_message = {e}
-            status_message = status.HTTP_500_INTERNAL_SERVER_ERROR
-        return Response(data=response_message, status=status_message)
-
-    @staticmethod
-    def create(request):
-        return Response(data={":)"})
-
-    @staticmethod
-    def retrieve(request, pk=None):
-        return Response(data={":)"})
-
-    @staticmethod
-    def update(request, pk=None):
-        return Response(data={":)"})
-
-    @staticmethod
-    def partial_update(request, pk=None):
-        return Response(data={":)"})
-
-    @staticmethod
-    def destroy(request, pk=None):
-        return Response(data={":)"})
+lda_model_list = LdaModelViewSet.as_view({
+    'get': 'list',
+    'post': 'create',
+    'put': 'update',
+})

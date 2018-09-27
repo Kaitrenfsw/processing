@@ -2,11 +2,9 @@ boto==2.48.0
 boto3==1.7.26
 botocore==1.10.26
 bz2file==0.98
-celery==4.2.1
 certifi==2018.4.16
 chardet==3.0.4
 Django==1.11.13
-django-celery-results==1.0.1
 django-cors-headers==2.2.0
 djangorestframework==3.8.2
 docutils==0.14

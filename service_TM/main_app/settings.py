@@ -42,13 +42,9 @@ INSTALLED_APPS = [
     'rest_framework',
     'corsheaders',
 
-    # celery backend
-    'django_celery_results',
-
     # internal_apps
     'topic',
     'TMengine',
-    'new',
 ]
 
 MIDDLEWARE = [
@@ -99,7 +95,8 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'postgres',
         'USER': 'postgres',
-        'HOST': 'db-processing',
+        'PASSWORD': 'root',
+        'HOST': 'db_processing',
         'PORT': 5432,
     }
 }
@@ -142,12 +139,3 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.11/howto/static-files/
 
 STATIC_URL = '/static/'
-
-# Celery config
-CELERY_BROKER_URL = 'amqp://rabbitmq-docker'
-CELERY_RESULT_BACKEND = 'django-db'
-CELERY_ACCEPT_CONTENT = ['json', 'application/x-python-serialize']
-CELERY_TASK_SERIALIZER = 'json'
-CELERY_RESULT_SERIALIZER = 'json'
-
-
