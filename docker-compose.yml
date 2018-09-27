@@ -1,13 +1,11 @@
 version: '3'
 
 services:
-  db-processing:
+  db_processing:
     image: postgres:9.6
     networks:
       - shared
-    ports:
-      - "5434:5432"
-  processing:
+  procesamiento:
     build: .
     command: python3 service_TM/manage.py runserver 0.0.0.0:8000
     volumes:
@@ -17,7 +15,7 @@ services:
     ports:
       - "8000:8000"
     depends_on:
-      - db-processing
+      - db_processing
 
 networks:
   shared: 
