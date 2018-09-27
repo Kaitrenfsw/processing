@@ -4,6 +4,7 @@ from rest_framework.response import Response
 from .models import LdaModel, TrainingStatus
 from .serializers import TrainingStatusSerializer
 import requests
+import time
 
 
 class LdaModelViewSet(viewsets.ViewSet):
@@ -29,13 +30,13 @@ class LdaModelViewSet(viewsets.ViewSet):
             for document in documents['documents']['records']:
                 corpus.append(document['clean_text'])
 
+            print(training_status.is_training)
             # Trigger async task to update LDA model
             update_model(corpus)
-
             training_status.is_training = False
             training_status.save()
 
-            response_message = {"Model update start!"}
+            response_message = {"Model update finished!"}
             status_message = status.HTTP_200_OK
         except Exception as e:
 
