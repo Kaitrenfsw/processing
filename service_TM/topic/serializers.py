@@ -1,12 +1,11 @@
 from topic.models import Topic, Keyword, TopicUser
 from rest_framework import serializers
-from rest_framework.response import Response
 
 
 class TopicSerializer(serializers.ModelSerializer):
     class Meta:
         model = Topic
-        fields = '__all__'
+        fields = ('topic_number', 'lda_model', 'name')
 
 
 class KeywordSerializer(serializers.ModelSerializer):
