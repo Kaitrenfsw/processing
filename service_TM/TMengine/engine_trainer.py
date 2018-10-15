@@ -179,8 +179,14 @@ def classify_new(documents):
                                  headers={'Content-Type': 'application/json'})
         topics_data = json.loads(request_1.data.decode('utf-8'))
 
-        print("antes")
-        print(document['topics'])
+        request_2 = http.request('GET', 'http://business-rules:8001/dateConversion/'
+                                 + document['published'],
+                                 headers={'Content-Type': 'application/json'})
+
+        week_code = json.loads(request_2.data.decode('utf-8'))
+        document['int_published'] = week_code[0]['week']
+
+
         # Replace topic internal number with id from business_rules service
         aux_document = []
         for topic in document['topics']:
@@ -189,8 +195,7 @@ def classify_new(documents):
                     topic['id'] = topic_data['id']
                     aux_document.append({"id": topic_data['id'], "weight": topic['weight']})
 
-        print("despues")
-        print(aux_document)
+
         # Request body formatting and encoding
         document['topics'] = aux_document
         news_classified.append(document)
@@ -200,11 +205,10 @@ def classify_new(documents):
         encoded_data = json.dumps(new_classified).encode('utf-8')
 
         # POST Request to categorized-data service
-        request_2 = http.request('POST', 'http://categorized_data:4000/api/documents/',
+        request_3 = http.request('POST', 'http://categorized_data:4000/api/documents/',
                                  body=encoded_data,
                                  headers={'Content-Type': 'application/json'})
-        print(request_2.status)
-        return request_2.status
+        return request_3.status
 
 
 
