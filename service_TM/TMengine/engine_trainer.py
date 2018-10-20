@@ -211,5 +211,49 @@ def classify_new(documents):
         return request_3.status
 
 
+def topic_relation():
+
+    # Get latest lda model saved
+    dirname = os.path.dirname(__file__)
+    latest_model = LdaModel.objects.get(in_use=True)
+    latest_filepath = os.path.join(dirname, 'lda_model/' + latest_model.filename)
+
+    # Create object for LDA model
+    lda_multicore = gensim.models.ldamulticore.LdaMulticore
+    # Loading latest model in use
+    lda_instance_1 = lda_multicore.load(latest_filepath)
+    lda_instance_2 = lda_multicore.load(latest_filepath)
+
+    # (row -> self.num_topics, col -> other.num_topics)
+    topic_diff_matrix, annotation = lda_instance_1.diff(lda_instance_2)
+
+    # Based in topic_diff matrix calculate differences between all topics in the same model
+    matrix_shape = topic_diff_matrix.shape
+    relations = []
+    relation_dict = {}
+    for row in range(0, matrix_shape[0]):
+        for col in range(0, matrix_shape[1]):
+            relation_dict["topic_1"] = row
+            relation_dict["topic_2"] = col
+            relation_dict["distance"] = round(topic_diff_matrix[row][col], 10)
+            relations.append(relation_dict)
+            relation_dict = {}
+
+    request_body = dict()
+    request_body["lda_filename"] = latest_model.filename
+    request_body["lda_model_id"] = 1
+    request_body["relations"] = relations
+    encoded_data = json.dumps(request_body).encode('utf-8')
+
+    # HTTP pool request
+    http = urllib3.PoolManager()
+    # GET Request to business_rules with topics ids
+    request = http.request('POST', 'http://business-rules:8001/topicComparison/',
+                           body=encoded_data,
+                           headers={'Content-Type': 'application/json'})
+
+
+
+
 
 
