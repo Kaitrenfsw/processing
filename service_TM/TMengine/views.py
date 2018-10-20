@@ -108,7 +108,7 @@ class TopicRelationViewSet(viewsets.ViewSet):
         try:
             topic_relation()
             status_message = status.HTTP_200_OK
-            response_message = {""}
+            response_message = {"Comparisons sent to business-rules service"}
         except Exception as e:
             response_message = {e}
             status_message = status.HTTP_500_INTERNAL_SERVER_ERROR

@@ -232,10 +232,19 @@ def topic_relation():
     relations = []
     relation_dict = {}
     for row in range(0, matrix_shape[0]):
+        keywords_1 = lda_instance_1.show_topic(topicid=row, topn=20)
         for col in range(0, matrix_shape[1]):
             relation_dict["topic_1"] = row
             relation_dict["topic_2"] = col
             relation_dict["distance"] = round(topic_diff_matrix[row][col], 10)
+
+            keywords_2 = lda_instance_2.show_topic(topicid=col, topn=20)
+            keywords = []
+            for keyword_1 in keywords_1:
+                for keyword_2 in keywords_2:
+                    if keyword_1[0] == keyword_2[0]:
+                        keywords.append(keyword_1[0])
+            relation_dict["keywords_match"] = keywords
             relations.append(relation_dict)
             relation_dict = {}
 
@@ -243,6 +252,7 @@ def topic_relation():
     request_body["lda_filename"] = latest_model.filename
     request_body["lda_model_id"] = 1
     request_body["relations"] = relations
+    print(request_body)
     encoded_data = json.dumps(request_body).encode('utf-8')
 
     # HTTP pool request
