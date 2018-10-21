@@ -166,6 +166,7 @@ def classify_new(documents):
         document.pop('updated_at')
         document.pop('created_at')
 
+
         # Create array with internal ids from topics and weight associated
         for classification in classifications[0]:
             document['topics'].append({'id': classification[0],
@@ -178,6 +179,7 @@ def classify_new(documents):
                                  + str(latest_model.pk),
                                  headers={'Content-Type': 'application/json'})
         topics_data = json.loads(request_1.data.decode('utf-8'))
+
 
         date = datetime.datetime.strptime(document['published'], "%d/%m/%Y")
         date_reformatted = date.date().strftime("%Y-%m-%d")
@@ -195,9 +197,7 @@ def classify_new(documents):
         for topic in document['topics']:
             for topic_data in topics_data[0]:
                 if topic_data['topic_number'] == topic['id']:
-                    topic['id'] = topic_data['id']
                     aux_document.append({"id": topic_data['id'], "weight": topic['weight']})
-
 
         # Request body formatting and encoding
         document['topics'] = aux_document
