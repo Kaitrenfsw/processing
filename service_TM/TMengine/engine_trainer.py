@@ -179,8 +179,11 @@ def classify_new(documents):
                                  headers={'Content-Type': 'application/json'})
         topics_data = json.loads(request_1.data.decode('utf-8'))
 
+        date = datetime.datetime.strptime(document['published'], "%d/%m/%Y")
+        date_reformatted = date.date().strftime("%Y-%m-%d")
+
         request_2 = http.request('GET', 'http://business-rules:8001/dateConversion/'
-                                 + document['published'],
+                                 + date_reformatted,
                                  headers={'Content-Type': 'application/json'})
 
         week_code = json.loads(request_2.data.decode('utf-8'))
