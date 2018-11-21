@@ -156,7 +156,7 @@ def classify_new(documents):
         # Converting list of documents (corpus) into Document Term Matrix using dictionary prepared above.
         doc_term_matrix = [dictionary.doc2bow(doc) for doc in new_tokenized]
         # Classification format [(<topic number>, <percentage>), ...]
-        classifications = lda_instance.get_document_topics(bow=doc_term_matrix, minimum_probability=0.001)
+        classifications = lda_instance.get_document_topics(bow=doc_term_matrix, minimum_probability=0.0001)
 
         # Formatting new info JSON object
         document['topics'] = []
