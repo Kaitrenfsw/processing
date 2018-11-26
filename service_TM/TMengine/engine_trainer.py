@@ -156,7 +156,7 @@ def classify_new(documents):
         # Converting list of documents (corpus) into Document Term Matrix using dictionary prepared above.
         doc_term_matrix = [dictionary.doc2bow(doc) for doc in new_tokenized]
         # Classification format [(<topic number>, <percentage>), ...]
-        classifications = lda_instance.get_document_topics(bow=doc_term_matrix, minimum_probability=0.15)
+        classifications = lda_instance.get_document_topics(bow=doc_term_matrix, minimum_probability=0.05)
 
         # Formatting new info JSON object
         document['topics'] = []
@@ -175,8 +175,7 @@ def classify_new(documents):
         # HTTP pool request
         http = urllib3.PoolManager()
         # GET Request to business_rules with topics ids
-        request_1 = http.request('GET', 'http://business-rules:8001/ldamodelTopics/'
-                                 + str(latest_model.pk),
+        request_1 = http.request('GET', 'http://business-rules:8001/ldamodelTopics/1',
                                  headers={'Content-Type': 'application/json'})
         topics_data = json.loads(request_1.data.decode('utf-8'))
 
