@@ -188,7 +188,7 @@ def classify_new(documents):
                                  headers={'Content-Type': 'application/json'})
 
         week_code = json.loads(request_2.data.decode('utf-8'))
-        document['int_published'] = week_code[0]['week']
+        document['int_published'] = week_code[-1]['week']
 
 
         # Replace topic internal number with id from business_rules service
